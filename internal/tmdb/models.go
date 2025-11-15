@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"time"
 
 	gotmdbapi "github.com/ralvarezdev/go-tmdb-api"
@@ -91,7 +92,14 @@ func MapToCastMember(castMember *gotmdbapi.Cast) *v1.CastMember {
 		popularity = new(float64)
 		*popularity = float64(*castMember.Popularity)
 	}
-
+	
+	// Parse profile path from relative to full URL
+	var profileUrl *string
+	if castMember.ProfilePath != nil && len(*castMember.ProfilePath) > 0 {
+		profileUrl = new(string)
+		*profileUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, CastMemberProfileImageWidthSize, (*castMember.ProfilePath)[1:])
+	}
+	
 	return &v1.CastMember{
 		Adult:           castMember.Adult,
 		Gender:          MapToGender(castMember.Gender),
@@ -100,7 +108,7 @@ func MapToCastMember(castMember *gotmdbapi.Cast) *v1.CastMember {
 		Name:            castMember.Name,
 		OriginalName:    castMember.OriginalName,
 		Popularity:      popularity,
-		ProfileUrl:      castMember.ProfilePath,
+		ProfileUrl:      profileUrl,
 		CastId:          string(castMember.ID),
 		Character:       castMember.Character,
 		CreditId:        castMember.CreditID,
@@ -121,6 +129,13 @@ func MapToCrewMember(crewMember *gotmdbapi.Crew) *v1.CrewMember {
 	if crewMember == nil {
 		return &v1.CrewMember{}
 	}
+	
+	// Parse profile path from relative to full URL
+	var profileUrl *string
+	if crewMember.ProfilePath != nil && len(*crewMember.ProfilePath) > 0 {
+		profileUrl = new(string)
+		*profileUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, CrewMemberProfileImageWidthSize, (*crewMember.ProfilePath)[1:])
+	}
 
 	return &v1.CrewMember{
 		Adult:           crewMember.Adult,
@@ -130,7 +145,7 @@ func MapToCrewMember(crewMember *gotmdbapi.Crew) *v1.CrewMember {
 		Name:            crewMember.Name,
 		OriginalName:    crewMember.OriginalName,
 		Popularity:      MapToOptionalFloat64(crewMember.Popularity),
-		ProfileUrl:      crewMember.ProfilePath,
+		ProfileUrl:      profileUrl,
 		CreditId:        crewMember.CreditID,
 		Department:      crewMember.Department,
 		Job:             crewMember.Job,
@@ -205,6 +220,13 @@ func MapToSimpleMovie(movie *gotmdbapi.SimpleMovie) *v1.SimpleMovie {
 	if movie == nil {
 		return &v1.SimpleMovie{}
 	}
+	
+	// Parse poster path from relative to full URL
+	var posterUrl string
+	if len(movie.PosterPath) > 0 {
+		posterUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, SimpleMoviePosterImageWidthSize, movie.PosterPath[1:])
+	}
+	
 	return &v1.SimpleMovie{
 		Adult:                movie.Adult,
 		GenreIds:             movie.GenreIDs,
@@ -213,7 +235,7 @@ func MapToSimpleMovie(movie *gotmdbapi.SimpleMovie) *v1.SimpleMovie {
 		OriginalTitle:        movie.OriginalTitle,
 		Overview:             movie.Overview,
 		Popularity:           MapToOptionalFloat64(movie.Popularity),
-		PosterUrl:            movie.PosterPath,
+		PosterUrl:            posterUrl,
 		ReleaseDate:          MapDateStringToTimestamp(movie.ReleaseDate),
 		Title:                movie.Title,
 		RatingAverageCritics: MapToOptionalFloat64(movie.VoteAverage),
@@ -434,9 +456,17 @@ func MapToProductionCompany(company *gotmdbapi.ProductionCompany) *v1.Production
 	if company == nil {
 		return &v1.ProductionCompany{}
 	}
+	
+	// Parse logo path from relative to full URL
+	var logoUrl *string
+	if company.LogoPath != nil && len(*company.LogoPath) > 0 {
+		logoUrl = new(string)
+		*logoUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, ProductionCompanyLogoImageWidthSize, (*company.LogoPath)[1:])
+	}
+	
 	return &v1.ProductionCompany{
 		Id:            company.ID,
-		LogoUrl:       company.LogoPath,
+		LogoUrl:       logoUrl,
 		Name:          company.Name,
 		OriginCountry: company.OriginCountry,
 	}
@@ -508,6 +538,13 @@ func MapToGetMovieDetailsResponse(response *gotmdbapi.MovieDetailsResponse) *v1.
 	if response == nil {
 		return &v1.GetMovieDetailsResponse{}
 	}
+	
+	// Parse poster path from relative to full URL
+	var posterUrl string
+	if len(response.PosterPath) > 0 {
+		posterUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, MovieDetailsPosterImageWidthSize, response.PosterPath[1:])
+	}
+	
 	return &v1.GetMovieDetailsResponse{
 		Adult:                response.Adult,
 		Budget:               response.Budget,
@@ -517,7 +554,7 @@ func MapToGetMovieDetailsResponse(response *gotmdbapi.MovieDetailsResponse) *v1.
 		Id:                   response.ID,
 		OriginalTitle:        response.OriginalTitle,
 		Overview:             response.Overview,
-		PosterUrl:            response.PosterPath,
+		PosterUrl:            posterUrl,
 		Popularity:           MapToOptionalFloat64(response.Popularity),
 		ProductionCompanies:  MapToProductionCompanies(response.ProductionCompanies),
 		ProductionCountries:  MapToProductionCountries(response.ProductionCountries),
