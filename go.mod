@@ -7,7 +7,7 @@ require (
 	connectrpc.com/grpcreflect v1.3.0
 	connectrpc.com/validate v0.6.0
 	github.com/joho/godotenv v1.5.1
-	github.com/ralvarezdev/go-connect v0.3.2
+	github.com/ralvarezdev/go-connect v0.3.3
 	github.com/ralvarezdev/go-connect-ralvarezdev v0.1.0
 	github.com/ralvarezdev/go-flags v0.3.8
 	github.com/ralvarezdev/go-jwt v0.8.5
