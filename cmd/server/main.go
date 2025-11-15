@@ -23,7 +23,7 @@ import (
 	gojwtflags "github.com/ralvarezdev/go-jwt/flags"
 	"golang.org/x/sync/errgroup"
 
-	protoauth "github.com/ralvarezdev/proto-auth/gen/go"
+	protomovies "github.com/ralvarezdev/proto-auth/gen/go"
 	authv1connect "github.com/ralvarezdev/proto-auth/gen/go/ralvarezdev/v1/v1connect"
 	"github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1/v1connect"
 
@@ -134,7 +134,7 @@ func main() {
 	// Initialize the auth interceptor
 	authInterceptor, err := goconnectauth.NewInterceptor(
 		internaljwt.Validator,
-		protoauth.Interceptions,
+		protomovies.Interceptions,
 		&goconnectauth.Options{
 			RefreshTokenFn: refreshTokenFn,
 		},
