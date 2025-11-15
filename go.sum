@@ -51,8 +51,8 @@ github.com/ralvarezdev/go-reflect v0.3.1 h1:+u59QNddIwI0lQWhWqO5gYGKC4oR0DP50uEp
 github.com/ralvarezdev/go-reflect v0.3.1/go.mod h1:CsZqMmJCXYow9l2YQIdvIe/q7aeRtlA3gq0r9dmLEN0=
 github.com/ralvarezdev/go-strings v0.2.3 h1:LNmfh75ggwzO89dwh9dRYY4UlVIe2HSAEnu2G5NXKJc=
 github.com/ralvarezdev/go-strings v0.2.3/go.mod h1:8sFOqmPJpqzS7bTjf91EzUCITnwpmkfifwY80GxV5r8=
-github.com/ralvarezdev/go-tmdb-api v0.2.0 h1:If1NFaJJiyx+INnQCUDJoKxi5pkZxx4HA2cV3k8Bdxc=
-github.com/ralvarezdev/go-tmdb-api v0.2.0/go.mod h1:VN90pycmx2nqpkMQTia0GcsPTMl08bVe0gCnAWoeiZI=
+github.com/ralvarezdev/go-tmdb-api v0.2.1 h1:4UDdiqic3XnqyqMEMX8ywy4taDEbmZCrtDMCCy566/0=
+github.com/ralvarezdev/go-tmdb-api v0.2.1/go.mod h1:VN90pycmx2nqpkMQTia0GcsPTMl08bVe0gCnAWoeiZI=
 github.com/ralvarezdev/proto-auth/gen/go v0.1.7 h1:lEHkwYjIoRKB+jpZ+aiYgEp/v8O+ea38QjYH9L9RAl8=
 github.com/ralvarezdev/proto-auth/gen/go v0.1.7/go.mod h1:/Oswy4CnjD96dvXsBc45OhrbtqR04CQz7dZXpc1eUnQ=
 github.com/ralvarezdev/proto-movies/gen/go v0.1.8 h1:hAy8V4xfhm6WOxhXe6mfPhSaYn9N992pnwDL3hDLdrY=

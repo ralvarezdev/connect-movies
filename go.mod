@@ -12,7 +12,7 @@ require (
 	github.com/ralvarezdev/go-flags v0.3.8
 	github.com/ralvarezdev/go-jwt v0.8.5
 	github.com/ralvarezdev/go-loader v0.2.22
-	github.com/ralvarezdev/go-tmdb-api v0.2.0
+	github.com/ralvarezdev/go-tmdb-api v0.2.1
 	github.com/ralvarezdev/proto-auth/gen/go v0.1.7
 	github.com/ralvarezdev/proto-movies/gen/go v0.1.8
 	github.com/redis/go-redis/v9 v9.16.0

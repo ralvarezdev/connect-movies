@@ -2,6 +2,13 @@ package service
 
 import (
 	"errors"
+
+	"connectrpc.com/connect"
+)
+
+var (
+	ErrMovieNotFound  = errors.New("movie not found for the given ID and this request")
+	ConnErrMovieNotFound = connect.NewError(connect.CodeNotFound, ErrMovieNotFound)
 )
 
 var (

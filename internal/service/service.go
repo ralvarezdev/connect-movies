@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"net/http"
 
 	gotmdbapi "github.com/ralvarezdev/go-tmdb-api"
 	v1 "github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1"
@@ -59,8 +60,11 @@ func (s *Service) GetMovieCredits(
 	}
 
 	// Call TMDB API to get movie credits
-	apiResponse, err := s.tmdbClient.GetMovieCredits(ctx, request.GetId(), request.GetLanguage())
+	apiResponse, statusCode, err := s.tmdbClient.GetMovieCredits(ctx, request.GetId(), request.GetLanguage())
 	if err != nil {
+		if statusCode == http.StatusNotFound {
+			return nil, ConnErrMovieNotFound
+		}
 		panic(err)
 	}
 
@@ -88,7 +92,7 @@ func (s *Service) GetTopRatedMovies(
 	}
 
 	// Call TMDB API to get top rated movies
-	apiResponse, err := s.tmdbClient.GetMoviesTopRated(
+	apiResponse, _, err := s.tmdbClient.GetMoviesTopRated(
 		ctx,
 		request.GetLanguage(),
 		request.GetPage(),
@@ -122,7 +126,7 @@ func (s *Service) GetPopularMovies(
 	}
 
 	// Call TMDB API to get popular movies
-	apiResponse, err := s.tmdbClient.GetMoviesPopular(
+	apiResponse, _, err := s.tmdbClient.GetMoviesPopular(
 		ctx,
 		request.GetLanguage(),
 		request.GetPage(),
@@ -155,7 +159,7 @@ func (s *Service) GetNowPlayingMovies(
 	}
 
 	// Call TMDB API to get now playing movies
-	apiResponse, err := s.tmdbClient.GetMoviesNowPlaying(
+	apiResponse, _, err := s.tmdbClient.GetMoviesNowPlaying(
 		ctx,
 		request.GetLanguage(),
 		request.GetPage(),
@@ -188,7 +192,7 @@ func (s *Service) GetUpcomingMovies(
 	}
 
 	// Call TMDB API to get upcoming movies
-	apiResponse, err := s.tmdbClient.GetMoviesUpcoming(
+	apiResponse, _, err := s.tmdbClient.GetMoviesUpcoming(
 		ctx,
 		request.GetLanguage(),
 		request.GetPage(),
@@ -221,8 +225,11 @@ func (s *Service) SimilarMovies(
 	}
 
 	// Call TMDB API to get similar movies
-	apiResponse, err := s.tmdbClient.SimilarMovies(ctx, request.GetId(), request.GetLanguage(), request.GetPage())
+	apiResponse, statusCode, err := s.tmdbClient.SimilarMovies(ctx, request.GetId(), request.GetLanguage(), request.GetPage())
 	if err != nil {
+		if statusCode == http.StatusNotFound {
+			return nil, ConnErrMovieNotFound
+		}
 		panic(err)
 	}
 
@@ -246,7 +253,7 @@ func (s *Service) SearchMovies(ctx context.Context, request *v1.SearchMoviesRequ
 	}
 
 	// Call TMDB API to search for movies
-	apiResponse, err := s.tmdbClient.SearchMovies(
+	apiResponse, _, err := s.tmdbClient.SearchMovies(
 		ctx,
 		request.GetQuery(),
 		request.GetIncludeAdult(),
@@ -283,8 +290,11 @@ func (s *Service) GetMovieDetails(
 	}
 
 	// Call TMDB API to get movie details
-	apiResponse, err := s.tmdbClient.GetMovieDetails(ctx, request.GetId(), request.GetLanguage())
+	apiResponse, statusCode, err := s.tmdbClient.GetMovieDetails(ctx, request.GetId(), request.GetLanguage())
 	if err != nil {
+		if statusCode == http.StatusNotFound {
+			return nil, ConnErrMovieNotFound
+		}
 		panic(err)
 	}
 
@@ -311,8 +321,11 @@ func (s *Service) GetMovieReviews(
 	}
 
 	// Call TMDB API to get movie reviews
-	apiResponse, err := s.tmdbClient.GetMovieReviews(ctx, request.GetId(), request.GetLanguage(), request.GetPage())
+	apiResponse, statusCode, err := s.tmdbClient.GetMovieReviews(ctx, request.GetId(), request.GetLanguage(), request.GetPage())
 	if err != nil {
+		if statusCode == http.StatusNotFound {
+			return nil, ConnErrMovieNotFound
+		}
 		panic(err)
 	}
 
