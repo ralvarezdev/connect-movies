@@ -1,9 +1,9 @@
 package redis
 
 import (
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 
-	internalloader "github.com/ralvarezdev/connect-movies-go/internal/loader"
+	internalloader "github.com/ralvarezdev/connect-movies/internal/loader"
 )
 
 const (

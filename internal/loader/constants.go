@@ -7,7 +7,7 @@ import (
 	goflagsmode "github.com/ralvarezdev/go-flags/mode"
 	goloaderenv "github.com/ralvarezdev/go-loader/env"
 
-	internallogger "github.com/ralvarezdev/connect-movies-go/internal/logger"
+	internallogger "github.com/ralvarezdev/connect-movies/internal/logger"
 )
 
 var (

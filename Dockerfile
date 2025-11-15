@@ -29,7 +29,8 @@ FROM alpine AS server
 WORKDIR /app
 COPY --from=builder /app .
 
-# Expose port to the outside world
+# Expose the HTTP and gRPC ports
+EXPOSE 8080
 EXPOSE 50051
 
 # Run the Go app when the container launches

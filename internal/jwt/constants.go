@@ -1,17 +1,19 @@
 package jwt
 
 import (
-	"strings"
+	"log/slog"
+	"os"
 	"time"
 
-	"github.com/redis/go-redis/v9"
 	goflagsmode "github.com/ralvarezdev/go-flags/mode"
+	gojwtflags "github.com/ralvarezdev/go-jwt/flags"
 	gojwttoken "github.com/ralvarezdev/go-jwt/token"
-	gojwtvalidator "github.com/ralvarezdev/go-jwt/token/validator"
 	gojwttokenclaims "github.com/ralvarezdev/go-jwt/token/claims"
 	gojwttokenclaimsredis "github.com/ralvarezdev/go-jwt/token/claims/redis"
+	gojwtvalidator "github.com/ralvarezdev/go-jwt/token/validator"
+	"github.com/redis/go-redis/v9"
 
-	internalloader "github.com/ralvarezdev/connect-movies-go/internal/loader"
+	internalloader "github.com/ralvarezdev/connect-movies/internal/loader"
 )
 
 const (
@@ -27,11 +29,11 @@ const (
 
 var (
 	// PublicKey is the JWT public key
-	PublicKey string
-	
+	PublicKey []byte
+
 	// Durations are the JWT tokens duration
 	Durations = make(map[gojwttoken.Token]time.Duration)
-	
+
 	// TokenValidator is the cache token validator
 	TokenValidator gojwttokenclaims.TokenValidator
 
@@ -47,17 +49,21 @@ var (
 // Parameters:
 //
 //   - mode: the mode flag to determine the logging level
+//   - publicKeyFlag: the public key flag
 //   - redisClient: the Redis client to use
+//   - logger: the logger to use
 func Load(
 	mode *goflagsmode.Flag,
+	publicKeyFlag *gojwtflags.PublicKeyFlag,
 	redisClient *redis.Client,
+	logger *slog.Logger,
 ) {
-	// Get the JWT public key
-	if err := internalloader.Loader.LoadVariable(EnvPublicKey, &PublicKey); err != nil {
-			panic(err)
-		}
-		PublicKey = strings.ReplaceAll(PublicKey, `\n`, "\n")
-	
+	// Load the JWT public key from file
+	publicKeyContent, err := os.ReadFile(publicKeyFlag.Path())
+	if err != nil {
+		panic(err)
+	}
+	PublicKey = publicKeyContent
 
 	// Get the JWT tokens duration
 	for key, env := range map[gojwttoken.Token]string{
@@ -65,19 +71,19 @@ func Load(
 		gojwttoken.RefreshToken: EnvRefreshTokenDuration,
 	} {
 		var tokenDuration time.Duration
-		if err := internalloader.Loader.LoadDurationVariable(
+		if durationErr := internalloader.Loader.LoadDurationVariable(
 			env,
 			&tokenDuration,
-		); err != nil {
-			panic(err)
+		); durationErr != nil {
+			panic(durationErr)
 		}
 		Durations[key] = tokenDuration
 	}
-	
+
 	// Initialize the token validator
 	tokenValidator, err := gojwttokenclaimsredis.NewTokenValidator(
 		redisClient,
-		nil,
+		logger,
 	)
 	if err != nil {
 		panic(err)
@@ -95,7 +101,7 @@ func Load(
 
 	// Create the JWT validator with ED25519 public key
 	validator, err := gojwtvalidator.NewEd25519Validator(
-		[]byte(PublicKey),
+		PublicKey,
 		claimsValidator,
 		mode,
 	)

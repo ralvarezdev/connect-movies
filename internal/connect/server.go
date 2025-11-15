@@ -1,0 +1,213 @@
+package connect
+
+import (
+	"context"
+	"log/slog"
+
+	v1 "github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1"
+	"github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1/v1connect"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	internalservice "github.com/ralvarezdev/connect-movies/internal/service"
+)
+
+type (
+	// Server is the gRPC server
+	Server struct {
+		logger  *slog.Logger
+		service *internalservice.Service
+		v1connect.UnimplementedMoviesServiceHandler
+	}
+)
+
+// NewServer creates a new gRPC server
+//
+// Parameters:
+//
+//   - service: the service for the server
+//   - logger: the logger
+//
+// Returns:
+//
+//   - *Server: the gRPC server
+//   - error: if there was an error creating the server
+func NewServer(service *internalservice.Service, logger *slog.Logger) (*Server, error) {
+	// Check if the service is nil
+	if service == nil {
+		return nil, internalservice.ErrNilService
+	}
+
+	// Create the logger for the gRPC server
+	if logger != nil {
+		logger = logger.With(
+			slog.String("component", "grpc_server"),
+		)
+	}
+
+	return &Server{
+		service: service,
+		logger:  logger,
+	}, nil
+}
+
+func (s Server) GetMovieCredits(
+	ctx context.Context,
+	request *v1.GetMovieCreditsRequest,
+) (*v1.GetMovieCreditsResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	// Call the service to get movie credits
+	response, err := s.service.GetMovieCredits(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (s Server) GetNowPlayingMovies(
+	ctx context.Context,
+	request *v1.GetNowPlayingMoviesRequest,
+) (*v1.GetNowPlayingMoviesResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	// Call the service to get now playing movies
+	response, err := s.service.GetNowPlayingMovies(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (s Server) GetPopularMovies(
+	ctx context.Context,
+	request *v1.GetPopularMoviesRequest,
+) (*v1.GetPopularMoviesResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	// Call the service to get popular movies
+	response, err := s.service.GetPopularMovies(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (s Server) GetTopRatedMovies(
+	ctx context.Context,
+	request *v1.GetTopRatedMoviesRequest,
+) (*v1.GetTopRatedMoviesResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	// Call the service to get top rated movies
+	response, err := s.service.GetTopRatedMovies(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (s Server) GetUpcomingMovies(
+	ctx context.Context,
+	request *v1.GetUpcomingMoviesRequest,
+) (*v1.GetUpcomingMoviesResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	// Call the service to get upcoming movies
+	response, err := s.service.GetUpcomingMovies(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (s Server) SimilarMovies(
+	ctx context.Context,
+	request *v1.SimilarMoviesRequest,
+) (*v1.SimilarMoviesResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	// Call the service to get similar movies
+	response, err := s.service.SimilarMovies(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (s Server) SearchMovies(ctx context.Context, request *v1.SearchMoviesRequest) (*v1.SearchMoviesResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	// Call the service to search movies
+	response, err := s.service.SearchMovies(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (s Server) GetMovieDetails(
+	ctx context.Context,
+	request *v1.GetMovieDetailsRequest,
+) (*v1.GetMovieDetailsResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	// Call the service to get movie details
+	response, err := s.service.GetMovieDetails(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (s Server) GetMovieReviews(
+	ctx context.Context,
+	request *v1.GetMovieReviewsRequest,
+) (*v1.GetMovieReviewsResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	// Call the service to get movie reviews
+	response, err := s.service.GetMovieReviews(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (s Server) DeleteMovieReview(
+	ctx context.Context,
+	request *v1.DeleteMovieReviewRequest,
+) (*v1.DeleteMovieReviewResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	return nil, status.Error(codes.Unimplemented, "method DeleteMovieReview not implemented")
+}
+
+func (s Server) AddMovieReview(
+	ctx context.Context,
+	request *v1.AddMovieReviewRequest,
+) (*v1.AddMovieReviewResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	return nil, status.Error(codes.Unimplemented, "method AddMovieReview not implemented")
+}
