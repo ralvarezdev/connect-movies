@@ -14,7 +14,7 @@ WORKDIR /app
 COPY . .
 
 # Run script to convert line endings
-RUN sh convert_line_endings.sh
+RUN sh format_lines.sh
 
 # Install Go dependencies
 RUN go mod download

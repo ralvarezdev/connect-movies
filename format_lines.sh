@@ -37,6 +37,3 @@ fi
 
 # Check and convert compile.sh
 check_and_convert_to_unix compile.sh
-
-# Check and convert build.sh
-check_and_convert_to_unix build.sh
