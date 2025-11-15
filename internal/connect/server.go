@@ -4,10 +4,9 @@ import (
 	"context"
 	"log/slog"
 
+	"connectrpc.com/connect"
 	v1 "github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1"
 	"github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1/v1connect"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	internalservice "github.com/ralvarezdev/connect-movies/internal/service"
 )
@@ -226,7 +225,10 @@ func (s Server) DeleteMovieReview(
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	return nil, status.Error(codes.Unimplemented, "method DeleteMovieReview not implemented")
+	return nil, connect.NewError(
+		connect.CodeUnimplemented,
+		ErrInDevelopment,
+	)
 }
 
 func (s Server) AddMovieReview(
@@ -236,5 +238,8 @@ func (s Server) AddMovieReview(
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	return nil, status.Error(codes.Unimplemented, "method AddMovieReview not implemented")
+	return nil, connect.NewError(
+		connect.CodeUnimplemented,
+		ErrInDevelopment,
+	)
 }
