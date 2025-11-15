@@ -9,6 +9,8 @@ import (
 var (
 	ErrMovieNotFound  = errors.New("movie not found for the given ID and this request")
 	ConnErrMovieNotFound = connect.NewError(connect.CodeNotFound, ErrMovieNotFound)
+	ErrUserMovieReviewAlreadyExists = errors.New("user movie review already exists for the given user and movie")
+	ConnErrUserMovieReviewAlreadyExists = connect.NewError(connect.CodeAlreadyExists, ErrUserMovieReviewAlreadyExists)
 )
 
 var (

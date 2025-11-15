@@ -8,6 +8,7 @@ require (
 	connectrpc.com/validate v0.6.0
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/joho/godotenv v1.5.1
+	github.com/ralvarezdev/connect-auth-types-go v0.1.1
 	github.com/ralvarezdev/go-connect v0.3.3
 	github.com/ralvarezdev/go-connect-ralvarezdev v0.1.0
 	github.com/ralvarezdev/go-databases v0.9.0
@@ -16,7 +17,7 @@ require (
 	github.com/ralvarezdev/go-loader v0.2.22
 	github.com/ralvarezdev/go-tmdb-api v0.3.2
 	github.com/ralvarezdev/proto-auth/gen/go v0.1.7
-	github.com/ralvarezdev/proto-movies/gen/go v0.2.0
+	github.com/ralvarezdev/proto-movies/gen/go v0.2.1
 	github.com/ralvarezdev/redis-auth-types-go v0.1.0
 	github.com/redis/go-redis/v9 v9.16.0
 	golang.org/x/sync v0.18.0

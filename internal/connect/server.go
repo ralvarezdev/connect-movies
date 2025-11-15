@@ -311,3 +311,22 @@ func (s Server) AddMovieReview(
 	}
 	return response, nil
 }
+
+func (s Server) GetUserMovieReview(
+	ctx context.Context,
+	request *v1.GetMovieReviewRequest,
+) (*v1.GetMovieReviewResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	
+	// Call the service to get user movie review
+	response, err := s.service.GetMovieReview(ctx, request)
+	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error getting user movie review", slog.String("error", err.Error()))
+		}
+		return nil, err
+	}
+	return response, nil
+}	

@@ -4,12 +4,16 @@ import (
 	"context"
 	"net/http"
 
+	"connectrpc.com/connect"
 	"github.com/jackc/pgx/v5/pgxpool"
 	godatabases "github.com/ralvarezdev/go-databases"
+	godatabasespgx "github.com/ralvarezdev/go-databases/sql/pgx"
 	gotmdbapi "github.com/ralvarezdev/go-tmdb-api"
 	v1 "github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1"
 	redisauthtypes "github.com/ralvarezdev/redis-auth-types-go"
 
+	goauthjwtclaims "github.com/ralvarezdev/connect-auth-types-go/jwt/claims"
+	internalpostgres "github.com/ralvarezdev/connect-movies/internal/databases/postgres"
 	internaltmdb "github.com/ralvarezdev/connect-movies/internal/tmdb"
 )
 
@@ -371,10 +375,10 @@ func (s *Service) DiscoverMovies(
 	if s == nil {
 		panic(ErrNilService)
 	}
-	
+
 	// Map sort by enum to SortByEnum
 	mappedSortBy := internaltmdb.MapToSortBy(*request.GetSortBy().Enum())
-	
+
 	// Map watch monetization types enum to WatchMonetizationTypesEnum slice
 	mappedWatchMonetizationTypes := internaltmdb.MapToWatchMonetizationTypes(request.GetWithWatchMonetizationTypes())
 
@@ -410,7 +414,7 @@ func (s *Service) DiscoverMovies(
 			WithOriginCountry:          request.GetWithOriginCountry(),
 			WithOriginalLanguage:       request.GetWithOriginalLanguage(),
 			WatchRegion:                request.GetWatchRegion(),
-			WithRuntimeGTE:            	request.GetWithRuntimeGte(),
+			WithRuntimeGTE:             request.GetWithRuntimeGte(),
 			WithRuntimeLTE:             request.GetWithRuntimeLte(),
 			WithWatchMonetizationTypes: mappedWatchMonetizationTypes,
 			WithWatchProviders:         request.GetWithWatchProviders(),
@@ -482,6 +486,10 @@ func (s *Service) AddMovieReview(
 	// Since TMDB API does not support adding reviews via API,
 	// we will store the review in our own database (Postgres)
 	// and return a success response.
+	return nil, connect.NewError(
+		connect.CodeUnimplemented,
+		ErrMovieNotFound,
+	)
 }
 
 // UpdateMovieReview updates a movie review
@@ -503,9 +511,34 @@ func (s *Service) UpdateMovieReview(
 		panic(ErrNilService)
 	}
 
-	// Since TMDB API does not support updating reviews via API,
-	// we will update the review in our own database (Postgres)
-	// and return a success response.
+	// Get the user ID from the auth response
+	userID, err := goauthjwtclaims.GetSubject(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	// Call the stored procedure to update the movie review in Postgres
+	if _, queryErr := s.pool.Exec(
+		ctx,
+		internalpostgres.CreateUserReviewProc,
+		userID,
+		request.GetId(),
+		request.GetRating(),
+		request.GetReview(),
+	); queryErr != nil {
+		isUniqueViolation, constraintName := godatabasespgx.IsUniqueViolationError(queryErr)
+		if !isUniqueViolation {
+			panic(queryErr)
+		}
+
+		// Check which unique constraint was violated
+		if constraintName != internalpostgres.UserReviewsUniqueUserMovieReview {
+			panic(queryErr)
+		}
+		return nil, ConnErrUserMovieReviewAlreadyExists
+	}
+
+	return &v1.UpdateMovieReviewResponse{}, nil
 }
 
 // DeleteMovieReview deletes a movie review
@@ -530,4 +563,26 @@ func (s *Service) DeleteMovieReview(
 	// Since TMDB API does not support deleting reviews via API,
 	// we will delete the review in our own database (Postgres)
 	// and return a success response.
+	return nil, connect.NewError(
+		connect.CodeUnimplemented,
+		ErrMovieNotFound,
+	)
+}
+
+
+func (s *Service) GetMovieReview(
+	ctx context.Context,
+	request *v1.GetMovieReviewRequest,
+) (*v1.GetMovieReviewResponse, error) {
+	if s == nil {
+		panic(ErrNilService)
+	}
+
+	// Since TMDB API does not support getting reviews via API,
+	// we will get the review from our own database (Postgres)
+	// and return a success response.
+	return nil, connect.NewError(
+		connect.CodeUnimplemented,
+		ErrMovieNotFound,
+	)
 }
