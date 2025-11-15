@@ -23,8 +23,8 @@ import (
 	gojwtflags "github.com/ralvarezdev/go-jwt/flags"
 	"golang.org/x/sync/errgroup"
 
-	protomovies "github.com/ralvarezdev/proto-movies/gen/go"
 	authv1connect "github.com/ralvarezdev/proto-auth/gen/go/ralvarezdev/v1/v1connect"
+	protomovies "github.com/ralvarezdev/proto-movies/gen/go"
 	"github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1/v1connect"
 
 	internalconnect "github.com/ralvarezdev/connect-movies/internal/connect"
@@ -211,17 +211,28 @@ func main() {
 		return nil
 	})
 
-	// Start the server
-	internallogger.Logger.Info(
-		"Starting gRPC server...",
-		slog.Int("port", internalconnect.GRPCPort),
-	)
-	if listenErr := grpcServer.ListenAndServe(); listenErr != nil && !errors.Is(listenErr, http.ErrServerClosed) {
-		internallogger.Logger.Error(
-			"Could not start gRPC server",
-			slog.String("error", listenErr.Error()),
+	// Start the gRPC server
+	eg.Go(func() error {
+		internallogger.Logger.Info(
+			"Starting gRPC server...",
+			slog.Int("port", internalconnect.GRPCPort),
 		)
-		panic(listenErr)
+		if listenErr := grpcServer.ListenAndServe(); listenErr != nil && !errors.Is(listenErr, http.ErrServerClosed) {
+			internallogger.Logger.Error(
+				"Could not start gRPC server",
+				slog.String("error", listenErr.Error()),
+			)
+			return listenErr
+		}
+		return nil
+	})
+
+	// Wait for goroutines to finish
+	if err := eg.Wait(); err != nil {
+		internallogger.Logger.Error(
+			"Server error",
+			slog.String("error", err.Error()),
+		)
 	}
 
 	// Wait for signal
