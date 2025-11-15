@@ -55,7 +55,7 @@ func (s *Service) GetMovieCredits(
 	request *v1.GetMovieCreditsRequest,
 ) (*v1.GetMovieCreditsResponse, error) {
 	if s == nil {
-		return nil, ErrNilService
+		panic(ErrNilService)
 	}
 
 	// Call TMDB API to get movie credits
@@ -84,7 +84,7 @@ func (s *Service) GetTopRatedMovies(
 	request *v1.GetTopRatedMoviesRequest,
 ) (*v1.GetTopRatedMoviesResponse, error) {
 	if s == nil {
-		return nil, ErrNilService
+		panic(ErrNilService)
 	}
 
 	// Call TMDB API to get top rated movies
@@ -118,7 +118,7 @@ func (s *Service) GetPopularMovies(
 	request *v1.GetPopularMoviesRequest,
 ) (*v1.GetPopularMoviesResponse, error) {
 	if s == nil {
-		return nil, ErrNilService
+		panic(ErrNilService)
 	}
 
 	// Call TMDB API to get popular movies
@@ -151,7 +151,7 @@ func (s *Service) GetNowPlayingMovies(
 	request *v1.GetNowPlayingMoviesRequest,
 ) (*v1.GetNowPlayingMoviesResponse, error) {
 	if s == nil {
-		return nil, ErrNilService
+		panic(ErrNilService)
 	}
 
 	// Call TMDB API to get now playing movies
@@ -184,7 +184,7 @@ func (s *Service) GetUpcomingMovies(
 	request *v1.GetUpcomingMoviesRequest,
 ) (*v1.GetUpcomingMoviesResponse, error) {
 	if s == nil {
-		return nil, ErrNilService
+		panic(ErrNilService)
 	}
 
 	// Call TMDB API to get upcoming movies
@@ -217,7 +217,7 @@ func (s *Service) SimilarMovies(
 	request *v1.SimilarMoviesRequest,
 ) (*v1.SimilarMoviesResponse, error) {
 	if s == nil {
-		return nil, ErrNilService
+		panic(ErrNilService)
 	}
 
 	// Call TMDB API to get similar movies
@@ -242,7 +242,7 @@ func (s *Service) SimilarMovies(
 // - error: if there was an error searching for movies
 func (s *Service) SearchMovies(ctx context.Context, request *v1.SearchMoviesRequest) (*v1.SearchMoviesResponse, error) {
 	if s == nil {
-		return nil, ErrNilService
+		panic(ErrNilService)
 	}
 
 	// Call TMDB API to search for movies
@@ -279,7 +279,7 @@ func (s *Service) GetMovieDetails(
 	request *v1.GetMovieDetailsRequest,
 ) (*v1.GetMovieDetailsResponse, error) {
 	if s == nil {
-		return nil, ErrNilService
+		panic(ErrNilService)
 	}
 
 	// Call TMDB API to get movie details
@@ -307,7 +307,7 @@ func (s *Service) GetMovieReviews(
 	request *v1.GetMovieReviewsRequest,
 ) (*v1.GetMovieReviewsResponse, error) {
 	if s == nil {
-		return nil, ErrNilService
+		panic(ErrNilService)
 	}
 
 	// Call TMDB API to get movie reviews

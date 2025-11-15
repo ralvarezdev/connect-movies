@@ -62,6 +62,9 @@ func (s Server) GetMovieCredits(
 	// Call the service to get movie credits
 	response, err := s.service.GetMovieCredits(ctx, request)
 	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error getting movie credits", slog.String("error", err.Error()))
+		}
 		return nil, err
 	}
 	return response, nil
@@ -78,6 +81,9 @@ func (s Server) GetNowPlayingMovies(
 	// Call the service to get now playing movies
 	response, err := s.service.GetNowPlayingMovies(ctx, request)
 	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error getting now playing movies", slog.String("error", err.Error()))
+		}
 		return nil, err
 	}
 	return response, nil
@@ -94,6 +100,9 @@ func (s Server) GetPopularMovies(
 	// Call the service to get popular movies
 	response, err := s.service.GetPopularMovies(ctx, request)
 	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error getting popular movies", slog.String("error", err.Error()))
+		}
 		return nil, err
 	}
 	return response, nil
@@ -110,6 +119,9 @@ func (s Server) GetTopRatedMovies(
 	// Call the service to get top rated movies
 	response, err := s.service.GetTopRatedMovies(ctx, request)
 	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error getting top rated movies", slog.String("error", err.Error()))
+		}
 		return nil, err
 	}
 	return response, nil
@@ -126,6 +138,9 @@ func (s Server) GetUpcomingMovies(
 	// Call the service to get upcoming movies
 	response, err := s.service.GetUpcomingMovies(ctx, request)
 	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error getting upcoming movies", slog.String("error", err.Error()))
+		}
 		return nil, err
 	}
 	return response, nil
@@ -142,6 +157,9 @@ func (s Server) SimilarMovies(
 	// Call the service to get similar movies
 	response, err := s.service.SimilarMovies(ctx, request)
 	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error getting similar movies", slog.String("error", err.Error()))
+		}
 		return nil, err
 	}
 	return response, nil
@@ -155,6 +173,9 @@ func (s Server) SearchMovies(ctx context.Context, request *v1.SearchMoviesReques
 	// Call the service to search movies
 	response, err := s.service.SearchMovies(ctx, request)
 	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error searching movies", slog.String("error", err.Error()))
+		}
 		return nil, err
 	}
 	return response, nil
@@ -171,6 +192,9 @@ func (s Server) GetMovieDetails(
 	// Call the service to get movie details
 	response, err := s.service.GetMovieDetails(ctx, request)
 	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error getting movie details", slog.String("error", err.Error()))
+		}
 		return nil, err
 	}
 	return response, nil
@@ -187,6 +211,9 @@ func (s Server) GetMovieReviews(
 	// Call the service to get movie reviews
 	response, err := s.service.GetMovieReviews(ctx, request)
 	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error getting movie reviews", slog.String("error", err.Error()))
+		}
 		return nil, err
 	}
 	return response, nil
