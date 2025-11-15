@@ -3,17 +3,13 @@ package jwt
 import (
 	"log/slog"
 	"os"
-	"time"
 
 	goflagsmode "github.com/ralvarezdev/go-flags/mode"
 	gojwtflags "github.com/ralvarezdev/go-jwt/flags"
-	gojwttoken "github.com/ralvarezdev/go-jwt/token"
 	gojwttokenclaims "github.com/ralvarezdev/go-jwt/token/claims"
 	gojwttokenclaimsredis "github.com/ralvarezdev/go-jwt/token/claims/redis"
 	gojwtvalidator "github.com/ralvarezdev/go-jwt/token/validator"
 	"github.com/redis/go-redis/v9"
-
-	internalloader "github.com/ralvarezdev/connect-movies/internal/loader"
 )
 
 const (
@@ -30,9 +26,6 @@ const (
 var (
 	// PublicKey is the JWT public key
 	PublicKey []byte
-
-	// Durations are the JWT tokens duration
-	Durations = make(map[gojwttoken.Token]time.Duration)
 
 	// TokenValidator is the cache token validator
 	TokenValidator gojwttokenclaims.TokenValidator
@@ -64,21 +57,6 @@ func Load(
 		panic(err)
 	}
 	PublicKey = publicKeyContent
-
-	// Get the JWT tokens duration
-	for key, env := range map[gojwttoken.Token]string{
-		gojwttoken.AccessToken:  EnvAccessTokenDuration,
-		gojwttoken.RefreshToken: EnvRefreshTokenDuration,
-	} {
-		var tokenDuration time.Duration
-		if durationErr := internalloader.Loader.LoadDurationVariable(
-			env,
-			&tokenDuration,
-		); durationErr != nil {
-			panic(durationErr)
-		}
-		Durations[key] = tokenDuration
-	}
 
 	// Initialize the token validator
 	tokenValidator, err := gojwttokenclaimsredis.NewTokenValidator(
