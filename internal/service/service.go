@@ -4,8 +4,11 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+	godatabases "github.com/ralvarezdev/go-databases"
 	gotmdbapi "github.com/ralvarezdev/go-tmdb-api"
 	v1 "github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1"
+	redisauthtypes "github.com/ralvarezdev/redis-auth-types-go"
 
 	internaltmdb "github.com/ralvarezdev/connect-movies/internal/tmdb"
 )
@@ -13,7 +16,9 @@ import (
 type (
 	// Service is the service for the gRPC server
 	Service struct {
-		tmdbClient *gotmdbapi.Client
+		tmdbClient           *gotmdbapi.Client
+		pool                 *pgxpool.Pool
+		redisUsernameHandler *redisauthtypes.UsernameHandler
 	}
 )
 
@@ -22,6 +27,8 @@ type (
 // Parameters:
 //
 // - tmdbClient: the TMDB API client
+// - pool: the Postgres connection pool
+// - redisUsernameHandler: the Redis username handler
 //
 // Returns:
 //
@@ -29,14 +36,28 @@ type (
 // - error: if there was an error creating the service
 func NewService(
 	tmdbClient *gotmdbapi.Client,
+	pool *pgxpool.Pool,
+	redisUsernameHandler *redisauthtypes.UsernameHandler,
 ) (*Service, error) {
+	// Check if the Postgres pool is nil
+	if pool == nil {
+		return nil, godatabases.ErrNilPool
+	}
+
+	// Check if the Redis username handler is nil
+	if redisUsernameHandler == nil {
+		return nil, redisauthtypes.ErrNilUsernameHandler
+	}
+
 	// Check if the TMDB API client is nil
 	if tmdbClient == nil {
 		return nil, gotmdbapi.ErrNilClient
 	}
 
 	return &Service{
-		tmdbClient: tmdbClient,
+		tmdbClient:           tmdbClient,
+		pool:                 pool,
+		redisUsernameHandler: redisUsernameHandler,
 	}, nil
 }
 
@@ -301,6 +322,111 @@ func (s *Service) GetMovieDetails(
 	return internaltmdb.MapToGetMovieDetailsResponse(apiResponse), nil
 }
 
+// GetMovieGenres gets the movie genres
+//
+// Parameters:
+//
+// - ctx: the context
+// - request: the get movie genres request
+//
+// Returns:
+//
+// - *v1.GetMovieGenresResponse: the get movie genres response
+// - error: if there was an error getting the movie genres
+func (s *Service) GetMovieGenres(
+	ctx context.Context,
+	request *v1.GetMovieGenresRequest,
+) (*v1.GetMovieGenresResponse, error) {
+	if s == nil {
+		panic(ErrNilService)
+	}
+
+	// Call TMDB API to get movie genres
+	apiResponse, _, err := s.tmdbClient.GetGenresMovieList(
+		ctx,
+		request.GetLanguage(),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	return internaltmdb.MapToGetMovieGenresResponse(apiResponse), nil
+}
+
+// DiscoverMovies discovers movies
+//
+// Parameters:
+//
+// - ctx: the context
+// - request: the discover movies request
+//
+// Returns:
+//
+// - *v1.DiscoverMoviesResponse: the discover movies response
+// - error: if there was an error discovering movies
+func (s *Service) DiscoverMovies(
+	ctx context.Context,
+	request *v1.DiscoverMoviesRequest,
+) (*v1.DiscoverMoviesResponse, error) {
+	if s == nil {
+		panic(ErrNilService)
+	}
+	
+	// Map sort by enum to SortByEnum
+	mappedSortBy := internaltmdb.MapToSortBy(*request.GetSortBy().Enum())
+	
+	// Map watch monetization types enum to WatchMonetizationTypesEnum slice
+	mappedWatchMonetizationTypes := internaltmdb.MapToWatchMonetizationTypes(request.GetWithWatchMonetizationTypes())
+
+	// Call TMDB API to discover movies
+	apiResponse, _, err := s.tmdbClient.DiscoverMovies(
+		ctx,
+		&gotmdbapi.DiscoverMoviesQueryParameters{
+			Certification:              request.GetCertification(),
+			CertificationCountry:       request.GetCertificationCountry(),
+			CertificationGTE:           request.GetCertificationGte(),
+			CertificationLTE:           request.GetCertificationLte(),
+			IncludeAdult:               request.GetIncludeAdult(),
+			IncludeVideo:               request.GetIncludeVideo(),
+			Language:                   request.GetLanguage(),
+			PrimaryReleaseYear:         request.GetPrimaryReleaseYear(),
+			PrimaryReleaseYearGTE:      request.GetPrimaryReleaseYearGte(),
+			PrimaryReleaseYearLTE:      request.GetPrimaryReleaseYearLte(),
+			Page:                       request.GetPage(),
+			Region:                     request.GetRegion(),
+			ReleaseDateGTE:             request.GetReleaseDateGte(),
+			ReleaseDateLTE:             request.GetReleaseDateLte(),
+			SortBy:                     mappedSortBy,
+			VoteAverageGTE:             request.GetVoteAverageGte(),
+			VoteAverageLTE:             request.GetVoteAverageLte(),
+			VoteCountGTE:               request.GetVoteCountGte(),
+			VoteCountLTE:               request.GetVoteCountLte(),
+			WithGenres:                 request.GetWithGenres(),
+			WithCompanies:              request.GetWithCompanies(),
+			WithKeywords:               request.GetWithKeywords(),
+			WithCast:                   request.GetWithCast(),
+			WithCrew:                   request.GetWithCrew(),
+			WithPeople:                 request.GetWithPeople(),
+			WithOriginCountry:          request.GetWithOriginCountry(),
+			WithOriginalLanguage:       request.GetWithOriginalLanguage(),
+			WatchRegion:                request.GetWatchRegion(),
+			WithRuntimeGTE:            	request.GetWithRuntimeGte(),
+			WithRuntimeLTE:             request.GetWithRuntimeLte(),
+			WithWatchMonetizationTypes: mappedWatchMonetizationTypes,
+			WithWatchProviders:         request.GetWithWatchProviders(),
+			WithoutCompanies:           request.GetWithoutCompanies(),
+			WithoutGenres:              request.GetWithoutGenres(),
+			WithoutKeywords:            request.GetWithoutKeywords(),
+			Year:                       request.GetYear(),
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	return internaltmdb.MapToDiscoverMoviesResponse(apiResponse), nil
+}
+
 // GetMovieReviews gets the movie reviews
 //
 // Parameters:
@@ -332,4 +458,76 @@ func (s *Service) GetMovieReviews(
 	// TODO: Add user reviews too
 
 	return internaltmdb.MapToGetMovieReviewsResponse(apiResponse), nil
+}
+
+// AddMovieReview adds a movie review
+//
+// Parameters:
+//
+// - ctx: the context
+// - request: the add movie review request
+//
+// Returns:
+//
+// - *v1.AddMovieReviewResponse: the add movie review response
+// - error: if there was an error adding the movie review
+func (s *Service) AddMovieReview(
+	ctx context.Context,
+	request *v1.AddMovieReviewRequest,
+) (*v1.AddMovieReviewResponse, error) {
+	if s == nil {
+		panic(ErrNilService)
+	}
+
+	// Since TMDB API does not support adding reviews via API,
+	// we will store the review in our own database (Postgres)
+	// and return a success response.
+}
+
+// UpdateMovieReview updates a movie review
+//
+// Parameters:
+//
+// - ctx: the context
+// - request: the update movie review request
+//
+// Returns:
+//
+// - *v1.UpdateMovieReviewResponse: the update movie review response
+// - error: if there was an error updating the movie review
+func (s *Service) UpdateMovieReview(
+	ctx context.Context,
+	request *v1.UpdateMovieReviewRequest,
+) (*v1.UpdateMovieReviewResponse, error) {
+	if s == nil {
+		panic(ErrNilService)
+	}
+
+	// Since TMDB API does not support updating reviews via API,
+	// we will update the review in our own database (Postgres)
+	// and return a success response.
+}
+
+// DeleteMovieReview deletes a movie review
+//
+// Parameters:
+//
+// - ctx: the context
+// - request: the delete movie review request
+//
+// Returns:
+//
+// - *v1.DeleteMovieReviewResponse: the delete movie review response
+// - error: if there was an error deleting the movie review
+func (s *Service) DeleteMovieReview(
+	ctx context.Context,
+	request *v1.DeleteMovieReviewRequest,
+) (*v1.DeleteMovieReviewResponse, error) {
+	if s == nil {
+		panic(ErrNilService)
+	}
+
+	// Since TMDB API does not support deleting reviews via API,
+	// we will delete the review in our own database (Postgres)
+	// and return a success response.
 }

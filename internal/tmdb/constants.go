@@ -24,6 +24,9 @@ const (
 	
 	// EnvMovieDetailsPosterImageWidthSize is the TMDB image width size for movie poster images on movie details environment variable
 	EnvMovieDetailsPosterImageWidthSize = "TMDB_MOVIE_DETAILS_POSTER_IMAGE_WIDTH_SIZE"
+	
+	// EnvAvatarImageWidthSize is the TMDB image width size for user avatar images environment variable
+	EnvAvatarImageWidthSize = "TMDB_AVATAR_IMAGE_WIDTH_SIZE"
 )
 
 var (
@@ -47,6 +50,9 @@ var (
 	
 	// MovieDetailsPosterImageWidthSize is the TMDB image width size for movie poster images on movie details
 	MovieDetailsPosterImageWidthSize int
+	
+	// AvatarImageWidthSize is the TMDB image width size for user avatar images
+	AvatarImageWidthSize int
 )
 
 // Load loads the TMDB API key
@@ -57,6 +63,23 @@ func Load() {
 		&TMDBAPIKey,
 	); err != nil {
 		panic(err)
+	}
+	
+	// Load the image width sizes from the environment variables
+	for env, dest := range map[string]*int{
+		EnvCastMemberProfileImageWidthSize:    &CastMemberProfileImageWidthSize,
+		EnvCrewMemberProfileImageWidthSize:    &CrewMemberProfileImageWidthSize,
+		EnvSimpleMoviePosterImageWidthSize:    &SimpleMoviePosterImageWidthSize,
+		EnvProductionCompanyLogoImageWidthSize: &ProductionCompanyLogoImageWidthSize,
+		EnvMovieDetailsPosterImageWidthSize:   &MovieDetailsPosterImageWidthSize,
+		EnvAvatarImageWidthSize:               &AvatarImageWidthSize,
+	} {
+		if err := internalloader.Loader.LoadIntVariable(
+			env,
+			dest,
+		); err != nil {
+			panic(err)
+		}
 	}
 
 	// Initialize the TMDB API client

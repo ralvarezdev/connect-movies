@@ -92,14 +92,14 @@ func MapToCastMember(castMember *gotmdbapi.Cast) *v1.CastMember {
 		popularity = new(float64)
 		*popularity = float64(*castMember.Popularity)
 	}
-	
+
 	// Parse profile path from relative to full URL
 	var profileUrl *string
 	if castMember.ProfilePath != nil && len(*castMember.ProfilePath) > 0 {
 		profileUrl = new(string)
 		*profileUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, CastMemberProfileImageWidthSize, (*castMember.ProfilePath)[1:])
 	}
-	
+
 	return &v1.CastMember{
 		Adult:           castMember.Adult,
 		Gender:          MapToGender(castMember.Gender),
@@ -129,7 +129,7 @@ func MapToCrewMember(crewMember *gotmdbapi.Crew) *v1.CrewMember {
 	if crewMember == nil {
 		return &v1.CrewMember{}
 	}
-	
+
 	// Parse profile path from relative to full URL
 	var profileUrl *string
 	if crewMember.ProfilePath != nil && len(*crewMember.ProfilePath) > 0 {
@@ -220,13 +220,13 @@ func MapToSimpleMovie(movie *gotmdbapi.SimpleMovie) *v1.SimpleMovie {
 	if movie == nil {
 		return &v1.SimpleMovie{}
 	}
-	
+
 	// Parse poster path from relative to full URL
 	var posterUrl string
 	if len(movie.PosterPath) > 0 {
 		posterUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, SimpleMoviePosterImageWidthSize, movie.PosterPath[1:])
 	}
-	
+
 	return &v1.SimpleMovie{
 		Adult:                movie.Adult,
 		GenreIds:             movie.GenreIDs,
@@ -456,14 +456,14 @@ func MapToProductionCompany(company *gotmdbapi.ProductionCompany) *v1.Production
 	if company == nil {
 		return &v1.ProductionCompany{}
 	}
-	
+
 	// Parse logo path from relative to full URL
 	var logoUrl *string
 	if company.LogoPath != nil && len(*company.LogoPath) > 0 {
 		logoUrl = new(string)
 		*logoUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, ProductionCompanyLogoImageWidthSize, (*company.LogoPath)[1:])
 	}
-	
+
 	return &v1.ProductionCompany{
 		Id:            company.ID,
 		LogoUrl:       logoUrl,
@@ -538,13 +538,13 @@ func MapToGetMovieDetailsResponse(response *gotmdbapi.MovieDetailsResponse) *v1.
 	if response == nil {
 		return &v1.GetMovieDetailsResponse{}
 	}
-	
+
 	// Parse poster path from relative to full URL
 	var posterUrl string
 	if len(response.PosterPath) > 0 {
 		posterUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, MovieDetailsPosterImageWidthSize, response.PosterPath[1:])
 	}
-	
+
 	return &v1.GetMovieDetailsResponse{
 		Adult:                response.Adult,
 		Budget:               response.Budget,
@@ -569,6 +569,35 @@ func MapToGetMovieDetailsResponse(response *gotmdbapi.MovieDetailsResponse) *v1.
 	}
 }
 
+// MapToCriticAuthorDetails maps a TMDB API author details to a gRPC critic author details
+//
+// Parameters:
+//
+// - authorDetails: the TMDB API author details to map
+//
+// Returns:
+//
+// - *v1.CriticAuthorDetails: the mapped gRPC author details
+func MapToCriticAuthorDetails(authorDetails *gotmdbapi.AuthorDetails) *v1.CriticAuthorDetails {
+	if authorDetails == nil {
+		return &v1.CriticAuthorDetails{}
+	}
+
+	// Parse avatar path from relative to full URL
+	var avatarUrl *string
+	if authorDetails.AvatarPath != nil && len(*authorDetails.AvatarPath) > 0 {
+		avatarUrl = new(string)
+		*avatarUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, AvatarImageWidthSize, (*authorDetails.AvatarPath)[1:])
+	}
+
+	return &v1.CriticAuthorDetails{
+		Name:       authorDetails.Name,
+		Username:   authorDetails.Username,
+		AvatarPath: avatarUrl,
+		Rating:     authorDetails.Rating,
+	}
+}
+
 // MapToMovieReview maps a TMDB API movie review to a gRPC movie review
 //
 // Parameters:
@@ -583,9 +612,10 @@ func MapToMovieReview(review *gotmdbapi.Review) *v1.MovieCriticReview {
 		return &v1.MovieCriticReview{}
 	}
 	return &v1.MovieCriticReview{
-		Id:      review.ID,
-		Author:  review.Author,
-		Content: review.Content,
+		Id:            review.ID,
+		Author:        review.Author,
+		AuthorDetails: MapToCriticAuthorDetails(&review.AuthorDetails),
+		Content:       review.Content,
 		CreatedAt: func() *timestamppb.Timestamp {
 			parsedTime, err := time.Parse(time.RFC3339, review.CreatedAt)
 			if err != nil {
@@ -640,4 +670,133 @@ func MapToGetMovieReviewsResponse(response *gotmdbapi.MovieReviewsResponse) *v1.
 		TotalPages:    response.TotalPages,
 		TotalResults:  response.TotalResults,
 	}
+}
+
+// MapToGetMovieGenresResponse maps a TMDB API genre list response to a gRPC get movie genres response
+//
+// Parameters:
+//
+// - response: the TMDB API genre list response to map
+//
+// Returns:
+//
+// - *v1.GetMovieGenresResponse: the mapped gRPC get movie genres response
+func MapToGetMovieGenresResponse(response *gotmdbapi.GenreListResponse) *v1.GetMovieGenresResponse {
+	if response == nil {
+		return &v1.GetMovieGenresResponse{}
+	}
+	return &v1.GetMovieGenresResponse{
+		Genres: MapToGenres(response.Genres),
+	}
+}
+
+// MapToDiscoverMoviesResponse maps a TMDB API movie list response to a gRPC discover movies response
+//
+// Parameters:
+//
+// - response: the TMDB API movie list response to map
+//
+// Returns:
+//
+// - *v1.DiscoverMoviesResponse: the mapped gRPC discover movies response
+func MapToDiscoverMoviesResponse(response *gotmdbapi.MovieListResponse) *v1.DiscoverMoviesResponse {
+	if response == nil {
+		return &v1.DiscoverMoviesResponse{}
+	}
+	return &v1.DiscoverMoviesResponse{
+		Page:         response.Page,
+		Results:      MapToSimpleMovies(response.Results),
+		TotalPages:   response.TotalPages,
+		TotalResults: response.TotalResults,
+	}
+}
+
+// MapToSortBy maps a gRPC sort by to a TMDB API sort by
+//
+// Parameters:
+//
+// - sortBy: the gRPC sort by to map
+//
+// Returns:
+//
+// - gotmdbapi.SortByEnum: the mapped TMDB API sort by
+func MapToSortBy(sortBy v1.SortBy) gotmdbapi.SortByEnum {
+	switch sortBy {
+	case v1.SortBy_SORT_BY_UNSPECIFIED:
+		return ""
+	case v1.SortBy_POPULARITY_ASC:
+		return gotmdbapi.SortByPopularityAsc
+	case v1.SortBy_POPULARITY_DESC:
+		return gotmdbapi.SortByPopularityDesc
+	case v1.SortBy_REVENUE_ASC:
+		return gotmdbapi.SortByRevenueAsc
+	case v1.SortBy_REVENUE_DESC:
+		return gotmdbapi.SortByRevenueDesc
+	case v1.SortBy_PRIMARY_RELEASE_DATE_ASC:
+		return gotmdbapi.SortByPrimaryReleaseDateAsc
+	case v1.SortBy_PRIMARY_RELEASE_DATE_DESC:
+		return gotmdbapi.SortByPrimaryReleaseDateDesc
+	case v1.SortBy_ORIGINAL_TITLE_ASC:
+		return gotmdbapi.SortByOriginalTitleAsc
+	case v1.SortBy_ORIGINAL_TITLE_DESC:
+		return gotmdbapi.SortByOriginalTitleDesc
+	case v1.SortBy_VOTE_AVERAGE_ASC:
+		return gotmdbapi.SortByVoteAverageAsc
+	case v1.SortBy_VOTE_AVERAGE_DESC:
+		return gotmdbapi.SortByVoteAverageDesc
+	case v1.SortBy_VOTE_COUNT_ASC:
+		return gotmdbapi.SortByVoteCountAsc
+	case v1.SortBy_VOTE_COUNT_DESC:
+		return gotmdbapi.SortByVoteCountDesc
+	default:
+		return ""
+	}
+}
+
+// MapToWatchMonetizationType maps a gRPC watch monetization type to a TMDB API watch monetization type
+// 
+// Parameters:
+// 
+// - t: the gRPC watch monetization type to map
+// 
+// Returns:
+// 
+// - gotmdbapi.WatchMonetizationTypeEnums: the mapped TMDB API watch monetization type
+func MapToWatchMonetizationType(t v1.WatchMonetizationType) gotmdbapi.WatchMonetizationTypeEnums {
+	switch t {
+	case v1.WatchMonetizationType_WATCH_MONETIZATION_TYPE_UNSPECIFIED:
+		return ""
+	case v1.WatchMonetizationType_FLATRATE:
+		return gotmdbapi.WatchMonetizationTypeFlatrate
+	case v1.WatchMonetizationType_FREE:
+		return gotmdbapi.WatchMonetizationTypeFree
+	case v1.WatchMonetizationType_ADS:
+		return gotmdbapi.WatchMonetizationTypeAds
+	case v1.WatchMonetizationType_RENT:
+		return gotmdbapi.WatchMonetizationTypeRent
+	case v1.WatchMonetizationType_BUY:
+		return gotmdbapi.WatchMonetizationTypeBuy
+	default:
+		return ""
+	}
+}
+
+// MapToWatchMonetizationTypes maps a slice of gRPC watch monetization types to a slice of TMDB API watch monetization types
+// 
+// Parameters:
+// 
+//  - types: the slice of gRPC watch monetization types to map
+// 
+// Returns:
+// 
+// - []gotmdbapi.WatchMonetizationTypeEnums: the mapped slice of TMDB API watch monetization types
+func MapToWatchMonetizationTypes(types []v1.WatchMonetizationType) []gotmdbapi.WatchMonetizationTypeEnums {
+	mappedTypes := make([]gotmdbapi.WatchMonetizationTypeEnums, 0, len(types))
+	for _, t := range types {
+		mappedType := MapToWatchMonetizationType(t)
+		if mappedType != "" {
+			mappedTypes = append(mappedTypes, mappedType)
+		}
+	}
+	return mappedTypes
 }

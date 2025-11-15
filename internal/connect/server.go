@@ -4,8 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"connectrpc.com/connect"
-	v1 "github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1"
+	"github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1"
 	"github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1/v1connect"
 
 	internalservice "github.com/ralvarezdev/connect-movies/internal/service"
@@ -218,6 +217,44 @@ func (s Server) GetMovieReviews(
 	return response, nil
 }
 
+func (s Server) GetMovieGenres(
+	ctx context.Context,
+	request *v1.GetMovieGenresRequest,
+) (*v1.GetMovieGenresResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	// Call the service to get movie genres
+	response, err := s.service.GetMovieGenres(ctx, request)
+	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error getting movie genres", slog.String("error", err.Error()))
+		}
+		return nil, err
+	}
+	return response, nil
+}	
+
+func (s Server) DiscoverMovies(
+	ctx context.Context,
+	request *v1.DiscoverMoviesRequest,
+) (*v1.DiscoverMoviesResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	// Call the service to discover movies
+	response, err := s.service.DiscoverMovies(ctx, request)
+	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error discovering movies", slog.String("error", err.Error()))
+		}
+		return nil, err
+	}
+	return response, nil
+}
+
 func (s Server) DeleteMovieReview(
 	ctx context.Context,
 	request *v1.DeleteMovieReviewRequest,
@@ -225,10 +262,35 @@ func (s Server) DeleteMovieReview(
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	return nil, connect.NewError(
-		connect.CodeUnimplemented,
-		ErrInDevelopment,
-	)
+	
+	// Call the service to delete movie review
+	response, err := s.service.DeleteMovieReview(ctx, request)
+	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error deleting movie review", slog.String("error", err.Error()))
+		}
+		return nil, err
+	}
+	return response, nil
+}
+
+func (s Server) UpdateMovieReview(
+	ctx context.Context,
+	request *v1.UpdateMovieReviewRequest,
+) (*v1.UpdateMovieReviewResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	
+	// Call the service to update movie review
+	response, err := s.service.UpdateMovieReview(ctx, request)
+	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error updating movie review", slog.String("error", err.Error()))
+		}
+		return nil, err
+	}
+	return response, nil
 }
 
 func (s Server) AddMovieReview(
@@ -238,8 +300,14 @@ func (s Server) AddMovieReview(
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	return nil, connect.NewError(
-		connect.CodeUnimplemented,
-		ErrInDevelopment,
-	)
+	
+	// Call the service to add movie review
+	response, err := s.service.AddMovieReview(ctx, request)
+	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("Error adding movie review", slog.String("error", err.Error()))
+		}
+		return nil, err
+	}
+	return response, nil
 }

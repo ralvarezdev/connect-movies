@@ -15,12 +15,14 @@ import (
 	"connectrpc.com/connect"
 	"connectrpc.com/grpcreflect"
 	"connectrpc.com/validate"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/joho/godotenv"
 	goconnectralvarezdevv1auth "github.com/ralvarezdev/go-connect-ralvarezdev/v1/auth"
 	goconnectauth "github.com/ralvarezdev/go-connect/server/interceptor/auth"
 	goconnecterrorhandler "github.com/ralvarezdev/go-connect/server/interceptor/errorhandler"
 	goflagsmode "github.com/ralvarezdev/go-flags/mode"
 	gojwtflags "github.com/ralvarezdev/go-jwt/flags"
+	redisauthtypes "github.com/ralvarezdev/redis-auth-types-go"
 	"golang.org/x/sync/errgroup"
 
 	authv1connect "github.com/ralvarezdev/proto-auth/gen/go/ralvarezdev/v1/v1connect"
@@ -68,7 +70,7 @@ func init() {
 	// Call the load functions
 	internallogger.Load(ModeFlag)
 	internalloader.Load(ModeFlag, internallogger.Logger)
-	internalpostgres.Load()
+	internalpostgres.Load(ModeFlag)
 	internalredis.Load()
 	internaljwt.Load(ModeFlag, PublicKeyPathFlag, internalredis.Client, internallogger.Logger)
 	internaltmdb.Load()
@@ -99,11 +101,30 @@ func main() {
 		internalconnect.AuthServiceAddress,
 		connect.WithGRPC(),
 	)
+	
+	// Create the Postgres database service
+	postgresPool, err := pgxpool.NewWithConfig(
+		ctx,
+		internalpostgres.PoolConfig,
+	)
+	if err != nil {
+		panic(err)
+	}
+	defer postgresPool.Close()
+	
+	// Create the Redis username handler
+	redisUsernameHandler, err := redisauthtypes.NewUsernameHandler(
+		internalredis.Client,
+	)
+	if err != nil {
+		panic(err)
+	}
 
 	// Create the service
 	service, err := internalservice.NewService(
 		internaltmdb.TMDBClient,
-		// postgresPool,
+		postgresPool,
+		redisUsernameHandler,
 		// internalconnect.RequestInjector,
 		// internalconnect.ResponseInjector,
 	)
