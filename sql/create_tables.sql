@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS user_reviews (
     review_text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE
+    deleted_at TIMESTAMP,
 );
 CREATE UNIQUE INDEX IF NOT EXISTS user_reviews_unique_user_movie_review
 ON user_reviews (user_id, movie_id);
