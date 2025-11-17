@@ -1,5 +1,5 @@
 # Stage 1: Build the Go app
-FROM golang:alpine AS builder
+FROM docker.io/library/golang:alpine AS builder
 
 # Install git to fetch dependencies
 RUN apk add --no-cache git dos2unix
@@ -23,7 +23,7 @@ RUN go mod download
 RUN sh compile.sh
 
 # Stage 2: Create a lightweight image for the Go app
-FROM alpine AS server
+FROM docker.io/library/alpine AS server
 
 # Set the Current Working Directory inside the container and copy the compiled Go app from the builder stage
 WORKDIR /app
