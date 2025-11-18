@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 
 	"connectrpc.com/connect"
@@ -464,49 +465,21 @@ func (s *Service) GetMovieReviews(
 	return internaltmdb.MapToGetMovieReviewsResponse(apiResponse), nil
 }
 
-// AddMovieReview adds a movie review
+// AddUserMovieReview adds a user movie review
 //
 // Parameters:
 //
 // - ctx: the context
-// - request: the add movie review request
+// - request: the add user movie review request
 //
 // Returns:
 //
-// - *v1.AddMovieReviewResponse: the add movie review response
-// - error: if there was an error adding the movie review
-func (s *Service) AddMovieReview(
+// - *v1.AddUserMovieReviewResponse: the add user movie review response
+// - error: if there was an error adding the user movie review
+func (s *Service) AddUserMovieReview(
 	ctx context.Context,
-	request *v1.AddMovieReviewRequest,
-) (*v1.AddMovieReviewResponse, error) {
-	if s == nil {
-		panic(ErrNilService)
-	}
-
-	// Since TMDB API does not support adding reviews via API,
-	// we will store the review in our own database (Postgres)
-	// and return a success response.
-	return nil, connect.NewError(
-		connect.CodeUnimplemented,
-		ErrMovieNotFound,
-	)
-}
-
-// UpdateMovieReview updates a movie review
-//
-// Parameters:
-//
-// - ctx: the context
-// - request: the update movie review request
-//
-// Returns:
-//
-// - *v1.UpdateMovieReviewResponse: the update movie review response
-// - error: if there was an error updating the movie review
-func (s *Service) UpdateMovieReview(
-	ctx context.Context,
-	request *v1.UpdateMovieReviewRequest,
-) (*v1.UpdateMovieReviewResponse, error) {
+	request *v1.AddUserMovieReviewRequest,
+) (*v1.AddUserMovieReviewResponse, error) {
 	if s == nil {
 		panic(ErrNilService)
 	}
@@ -517,7 +490,7 @@ func (s *Service) UpdateMovieReview(
 		panic(err)
 	}
 
-	// Call the stored procedure to update the movie review in Postgres
+	// Call the stored procedure to create the movie review in Postgres
 	if _, queryErr := s.pool.Exec(
 		ctx,
 		internalpostgres.CreateUserReviewProc,
@@ -537,43 +510,110 @@ func (s *Service) UpdateMovieReview(
 		}
 		return nil, ConnErrUserMovieReviewAlreadyExists
 	}
-
-	return &v1.UpdateMovieReviewResponse{}, nil
+	return &v1.AddUserMovieReviewResponse{}, nil
 }
 
-// DeleteMovieReview deletes a movie review
+// UpdateUserMovieReview updates a user movie review
 //
 // Parameters:
 //
 // - ctx: the context
-// - request: the delete movie review request
+// - request: the update user movie review request
 //
 // Returns:
 //
-// - *v1.DeleteMovieReviewResponse: the delete movie review response
-// - error: if there was an error deleting the movie review
-func (s *Service) DeleteMovieReview(
+// - *v1.UpdateUserMovieReviewResponse: the update user movie review response
+// - error: if there was an error updating the user movie review
+func (s *Service) UpdateUserMovieReview(
 	ctx context.Context,
-	request *v1.DeleteMovieReviewRequest,
-) (*v1.DeleteMovieReviewResponse, error) {
+	request *v1.UpdateUserMovieReviewRequest,
+) (*v1.UpdateUserMovieReviewResponse, error) {
 	if s == nil {
 		panic(ErrNilService)
 	}
 
-	// Since TMDB API does not support deleting reviews via API,
-	// we will delete the review in our own database (Postgres)
-	// and return a success response.
-	return nil, connect.NewError(
-		connect.CodeUnimplemented,
-		ErrMovieNotFound,
-	)
+	// Get the user ID from the auth response
+	userID, err := goauthjwtclaims.GetSubject(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	// Call the stored procedure to update the movie review in Postgres
+	var userReviewFound sql.NullBool
+	if queryErr := s.pool.QueryRow(
+		ctx,
+		internalpostgres.UpdateUserReviewProc,
+		userID,
+		request.GetId(),
+		request.GetRating(),
+		request.GetReview(),
+		nil,
+	).Scan(
+		&userReviewFound,
+	); queryErr != nil {
+		panic(queryErr)
+	}
+	
+	// Check if the user review was found
+	if !userReviewFound.Valid || !userReviewFound.Bool {
+		return nil, ConnErrUserMovieReviewNotFound
+	}		
+
+	return &v1.UpdateUserMovieReviewResponse{}, nil
+}
+
+// DeleteUserMovieReview deletes a user movie review
+//
+// Parameters:
+//
+// - ctx: the context
+// - request: the delete user movie review request
+//
+// Returns:
+//
+// - *v1.DeleteUserMovieReviewResponse: the delete user movie review response
+// - error: if there was an error deleting the user movie review
+func (s *Service) DeleteUserMovieReview(
+	ctx context.Context,
+	request *v1.DeleteUserMovieReviewRequest,
+) (*v1.DeleteUserMovieReviewResponse, error) {
+	if s == nil {
+		panic(ErrNilService)
+	}
+
+	// Get the user ID from the auth response
+	userID, err := goauthjwtclaims.GetSubject(ctx)
+	if err != nil {
+		panic(err)
+	}
+	
+	// Call the stored procedure to delete the movie review in Postgres
+	var userReviewFound sql.NullBool
+	if queryErr := s.pool.QueryRow(
+		ctx,
+		internalpostgres.DeleteUserReviewProc,
+		userID,
+		request.GetId(),
+		nil,
+	).Scan(
+		&userReviewFound,
+	); queryErr != nil {
+		panic(queryErr)
+	}
+	
+	// Check if the user review was found
+	if !userReviewFound.Valid || !userReviewFound.Bool {
+		return nil, ConnErrUserMovieReviewNotFound
+	}
+	
+	return &v1.DeleteUserMovieReviewResponse{}, nil
 }
 
 
-func (s *Service) GetMovieReview(
+func (s *Service) GetUserMovieReview(
 	ctx context.Context,
-	request *v1.GetMovieReviewRequest,
-) (*v1.GetMovieReviewResponse, error) {
+	request *v1.GetUserMovieReviewRequest,
+) (*v1.GetUserMovieReviewResponse, error) {
 	if s == nil {
 		panic(ErrNilService)
 	}

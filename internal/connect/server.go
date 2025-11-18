@@ -255,16 +255,16 @@ func (s Server) DiscoverMovies(
 	return response, nil
 }
 
-func (s Server) DeleteMovieReview(
+func (s Server) DeleteUserMovieReview(
 	ctx context.Context,
-	request *v1.DeleteMovieReviewRequest,
-) (*v1.DeleteMovieReviewResponse, error) {
+	request *v1.DeleteUserMovieReviewRequest,
+) (*v1.DeleteUserMovieReviewResponse, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
 	
-	// Call the service to delete movie review
-	response, err := s.service.DeleteMovieReview(ctx, request)
+	// Call the service to delete user movie review
+	response, err := s.service.DeleteUserMovieReview(ctx, request)
 	if err != nil {
 		if s.logger != nil {
 			s.logger.Error("Error deleting movie review", slog.String("error", err.Error()))
@@ -274,16 +274,16 @@ func (s Server) DeleteMovieReview(
 	return response, nil
 }
 
-func (s Server) UpdateMovieReview(
+func (s Server) UpdateUserMovieReview(
 	ctx context.Context,
-	request *v1.UpdateMovieReviewRequest,
-) (*v1.UpdateMovieReviewResponse, error) {
+	request *v1.UpdateUserMovieReviewRequest,
+) (*v1.UpdateUserMovieReviewResponse, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
 	
-	// Call the service to update movie review
-	response, err := s.service.UpdateMovieReview(ctx, request)
+	// Call the service to update user movie review
+	response, err := s.service.UpdateUserMovieReview(ctx, request)
 	if err != nil {
 		if s.logger != nil {
 			s.logger.Error("Error updating movie review", slog.String("error", err.Error()))
@@ -293,16 +293,16 @@ func (s Server) UpdateMovieReview(
 	return response, nil
 }
 
-func (s Server) AddMovieReview(
+func (s Server) AddUserMovieReview(
 	ctx context.Context,
-	request *v1.AddMovieReviewRequest,
-) (*v1.AddMovieReviewResponse, error) {
+	request *v1.AddUserMovieReviewRequest,
+) (*v1.AddUserMovieReviewResponse, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
 	
-	// Call the service to add movie review
-	response, err := s.service.AddMovieReview(ctx, request)
+	// Call the service to add user movie review
+	response, err := s.service.AddUserMovieReview(ctx, request)
 	if err != nil {
 		if s.logger != nil {
 			s.logger.Error("Error adding movie review", slog.String("error", err.Error()))
@@ -314,14 +314,14 @@ func (s Server) AddMovieReview(
 
 func (s Server) GetUserMovieReview(
 	ctx context.Context,
-	request *v1.GetMovieReviewRequest,
-) (*v1.GetMovieReviewResponse, error) {
+	request *v1.GetUserMovieReviewRequest,
+) (*v1.GetUserMovieReviewResponse, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
 	
 	// Call the service to get user movie review
-	response, err := s.service.GetMovieReview(ctx, request)
+	response, err := s.service.GetUserMovieReview(ctx, request)
 	if err != nil {
 		if s.logger != nil {
 			s.logger.Error("Error getting user movie review", slog.String("error", err.Error()))
