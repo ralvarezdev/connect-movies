@@ -9,4 +9,7 @@ const (
 	
 	// DeleteUserReviewProc is the query to call the stored procedure to delete user review
 	DeleteUserReviewProc = "CALL delete_user_review($1, $2, $3)"
+	
+	// GetUserReviewProc is the query to call the stored procedure to get user review
+	GetUserReviewProc = "CALL get_user_review($1, $2, $3, $4, $5, $6, $7)"
 )

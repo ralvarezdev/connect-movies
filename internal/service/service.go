@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"net/http"
 
-	"connectrpc.com/connect"
 	"github.com/jackc/pgx/v5/pgxpool"
 	godatabases "github.com/ralvarezdev/go-databases"
 	godatabasespgx "github.com/ralvarezdev/go-databases/sql/pgx"
@@ -553,11 +552,11 @@ func (s *Service) UpdateUserMovieReview(
 	); queryErr != nil {
 		panic(queryErr)
 	}
-	
+
 	// Check if the user review was found
 	if !userReviewFound.Valid || !userReviewFound.Bool {
 		return nil, ConnErrUserMovieReviewNotFound
-	}		
+	}
 
 	return &v1.UpdateUserMovieReviewResponse{}, nil
 }
@@ -586,7 +585,7 @@ func (s *Service) DeleteUserMovieReview(
 	if err != nil {
 		panic(err)
 	}
-	
+
 	// Call the stored procedure to delete the movie review in Postgres
 	var userReviewFound sql.NullBool
 	if queryErr := s.pool.QueryRow(
@@ -600,15 +599,14 @@ func (s *Service) DeleteUserMovieReview(
 	); queryErr != nil {
 		panic(queryErr)
 	}
-	
+
 	// Check if the user review was found
 	if !userReviewFound.Valid || !userReviewFound.Bool {
 		return nil, ConnErrUserMovieReviewNotFound
 	}
-	
+
 	return &v1.DeleteUserMovieReviewResponse{}, nil
 }
-
 
 func (s *Service) GetUserMovieReview(
 	ctx context.Context,
@@ -618,11 +616,49 @@ func (s *Service) GetUserMovieReview(
 		panic(ErrNilService)
 	}
 
-	// Since TMDB API does not support getting reviews via API,
-	// we will get the review from our own database (Postgres)
-	// and return a success response.
-	return nil, connect.NewError(
-		connect.CodeUnimplemented,
-		ErrMovieNotFound,
+	// Get the user ID from the auth response
+	userID, err := goauthjwtclaims.GetSubject(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	// Call the stored procedure to get the movie review in Postgres
+	var (
+		outRating          sql.NullInt32
+		outReviewText      sql.NullString
+		outCreatedAt       sql.NullTime
+		outUpdatedAt       sql.NullTime
+		outUserReviewFound sql.NullBool
 	)
+	if queryErr := s.pool.QueryRow(
+		ctx,
+		internalpostgres.GetUserReviewProc,
+		userID,
+		request.GetId(),
+		&outRating,
+		&outReviewText,
+		&outCreatedAt,
+		&outUpdatedAt,
+		&outUserReviewFound,
+	).Scan(
+		&outRating,
+		&outReviewText,
+		&outCreatedAt,
+		&outUpdatedAt,
+		&outUserReviewFound,
+	); queryErr != nil {
+		panic(queryErr)
+	}
+
+	// Check if the user review was found
+	if !outUserReviewFound.Valid || !outUserReviewFound.Bool {
+		return nil, ConnErrUserMovieReviewNotFound
+	}
+
+	return &v1.GetUserMovieReviewResponse{
+		UserReview: &v1.UserMovieReview{
+			Rating:    int32(outRating.Int32),
+			Review:    outReviewText.String,
+		},
+	}, nil
 }
