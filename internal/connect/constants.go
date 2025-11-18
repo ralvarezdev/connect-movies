@@ -11,22 +11,16 @@ const (
 	// EnvAuthServiceAddress is the environment variable for the auth service address
 	EnvAuthServiceAddress = "AUTH_SERVICE_ADDRESS"
 
-	// EnvHTTPPort is the environment variable for the service HTTP port
-	EnvHTTPPort = "HTTP_PORT"
-
-	// EnvGRPCPort is the environment variable for the service gRPC port
-	EnvGRPCPort = "GRPC_PORT"
+	// EnvPort is the environment variable for the service Movies server port
+	EnvPort = "PORT"
 )
 
 var (
 	// AuthServiceAddress is the auth service address
 	AuthServiceAddress string
 
-	// HTTPPort is the service HTPP port
-	HTTPPort int
-
-	// GRPCPort is the service gRPC port
-	GRPCPort int
+	// Port is the Movies server port
+	Port int
 
 	// RequestInjector is the request injector
 	RequestInjector goconnectrequest.Injector
@@ -45,18 +39,13 @@ func Load() {
 		panic(err)
 	}
 
-	// Get the service ports from the environment variable
-	for env, dest := range map[string]*int{
-		EnvHTTPPort: &HTTPPort,
-		EnvGRPCPort: &GRPCPort,
-	} {
-		if err := internalloader.Loader.LoadIntVariable(
-			env,
-			dest,
+	// Get the service port from the environment variable
+	if err := internalloader.Loader.LoadIntVariable(
+		EnvPort,
+		&Port,
 		); err != nil {
 			panic(err)
 		}
-	}
 
 	// Create the request injector
 	RequestInjector = goconnectrequest.NewDefaultInterceptor()

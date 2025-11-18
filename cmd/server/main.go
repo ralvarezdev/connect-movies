@@ -23,7 +23,6 @@ import (
 	goflagsmode "github.com/ralvarezdev/go-flags/mode"
 	gojwtflags "github.com/ralvarezdev/go-jwt/flags"
 	redisauthtypes "github.com/ralvarezdev/redis-auth-types-go"
-	"golang.org/x/sync/errgroup"
 
 	authv1connect "github.com/ralvarezdev/proto-auth/gen/go/ralvarezdev/v1/v1connect"
 	protomovies "github.com/ralvarezdev/proto-movies/gen/go"
@@ -101,7 +100,7 @@ func main() {
 		internalconnect.AuthServiceAddress,
 		connect.WithGRPC(),
 	)
-	
+
 	// Create the Postgres database service
 	postgresPool, err := pgxpool.NewWithConfig(
 		ctx,
@@ -111,7 +110,7 @@ func main() {
 		panic(err)
 	}
 	defer postgresPool.Close()
-	
+
 	// Create the Redis username handler
 	redisUsernameHandler, err := redisauthtypes.NewUsernameHandler(
 		internalredis.Client,
@@ -184,6 +183,12 @@ func main() {
 	)
 	mux.Handle(path, handler)
 
+	// Add a health check endpoint
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
 	// Rgister reflection service on gRPC server.
 	reflector := grpcreflect.NewStaticReflector(
 		v1connect.MoviesServiceName,
@@ -194,67 +199,31 @@ func main() {
 	// most servers should mount both handlers.
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
 
-	// Create the protocols for the HTTP/1.1 and HTTP/2 Cleartext
-	p := new(http.Protocols)
-	p.SetHTTP1(true)
-	p.SetHTTP2(true)
+	// Create the protocols for HTTP/1.1 and HTTP/2 Cleartext
+	protocols := new(http.Protocols)
+	protocols.SetHTTP1(true)
+	protocols.SetHTTP2(true)
+	protocols.SetUnencryptedHTTP2(true)
 
-	// Create server for HTTP User Service
-	httpServer := http.Server{
-		Addr:      fmt.Sprintf("0.0.0.0:%d", internalconnect.HTTPPort),
+	// Create server for Movies Service
+	server := http.Server{
+		Addr:      fmt.Sprintf("0.0.0.0:%d", internalconnect.Port),
 		Handler:   mux,
-		Protocols: p,
+		Protocols: protocols,
 	}
 
-	// Create server for gRPC User Service
-	grpcServer := http.Server{
-		Addr:      fmt.Sprintf("0.0.0.0:%d", internalconnect.GRPCPort),
-		Handler:   mux,
-		Protocols: p,
-	}
-
-	// Create the error group
-	var eg errgroup.Group
-
-	// Start the HTTP server
-	eg.Go(func() error {
+	// Start the Movies server
 		internallogger.Logger.Info(
-			"Starting HTTP server...",
-			slog.Int("port", internalconnect.HTTPPort),
+			"Starting Movies server...",
+			slog.Int("port", internalconnect.Port),
 		)
-		if listenErr := httpServer.ListenAndServe(); listenErr != nil && !errors.Is(listenErr, http.ErrServerClosed) {
+		if listenErr := server.ListenAndServe(); listenErr != nil && !errors.Is(listenErr, http.ErrServerClosed) {
 			internallogger.Logger.Error(
-				"Could not start HTTP server",
+				"Could not start Movies server",
 				slog.String("error", listenErr.Error()),
 			)
-			return listenErr
+			panic(listenErr)
 		}
-		return nil
-	})
-
-	// Start the gRPC server
-	eg.Go(func() error {
-		internallogger.Logger.Info(
-			"Starting gRPC server...",
-			slog.Int("port", internalconnect.GRPCPort),
-		)
-		if listenErr := grpcServer.ListenAndServe(); listenErr != nil && !errors.Is(listenErr, http.ErrServerClosed) {
-			internallogger.Logger.Error(
-				"Could not start gRPC server",
-				slog.String("error", listenErr.Error()),
-			)
-			return listenErr
-		}
-		return nil
-	})
-
-	// Wait for goroutines to finish
-	if err := eg.Wait(); err != nil {
-		internallogger.Logger.Error(
-			"Server error",
-			slog.String("error", err.Error()),
-		)
-	}
 
 	// Wait for signal
 	<-ctx.Done()
