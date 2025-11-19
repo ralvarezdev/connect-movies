@@ -213,17 +213,17 @@ func main() {
 	}
 
 	// Start the Movies server
-		internallogger.Logger.Info(
-			"Starting Movies server...",
-			slog.Int("port", internalconnect.Port),
+	internallogger.Logger.Info(
+		"Starting Movies server...",
+		slog.Int("port", internalconnect.Port),
+	)
+	if listenErr := server.ListenAndServe(); listenErr != nil && !errors.Is(listenErr, http.ErrServerClosed) {
+		internallogger.Logger.Error(
+			"Could not start Movies server",
+			slog.String("error", listenErr.Error()),
 		)
-		if listenErr := server.ListenAndServe(); listenErr != nil && !errors.Is(listenErr, http.ErrServerClosed) {
-			internallogger.Logger.Error(
-				"Could not start Movies server",
-				slog.String("error", listenErr.Error()),
-			)
-			panic(listenErr)
-		}
+		panic(listenErr)
+	}
 
 	// Wait for signal
 	<-ctx.Done()

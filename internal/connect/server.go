@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1"
+	v1 "github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1"
 	"github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1/v1connect"
 
 	internalservice "github.com/ralvarezdev/connect-movies/internal/service"
@@ -234,7 +234,7 @@ func (s Server) GetMovieGenres(
 		return nil, err
 	}
 	return response, nil
-}	
+}
 
 func (s Server) DiscoverMovies(
 	ctx context.Context,
@@ -262,7 +262,7 @@ func (s Server) DeleteUserMovieReview(
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	
+
 	// Call the service to delete user movie review
 	response, err := s.service.DeleteUserMovieReview(ctx, request)
 	if err != nil {
@@ -281,7 +281,7 @@ func (s Server) UpdateUserMovieReview(
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	
+
 	// Call the service to update user movie review
 	response, err := s.service.UpdateUserMovieReview(ctx, request)
 	if err != nil {
@@ -300,7 +300,7 @@ func (s Server) AddUserMovieReview(
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	
+
 	// Call the service to add user movie review
 	response, err := s.service.AddUserMovieReview(ctx, request)
 	if err != nil {
@@ -319,7 +319,7 @@ func (s Server) GetUserMovieReview(
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	
+
 	// Call the service to get user movie review
 	response, err := s.service.GetUserMovieReview(ctx, request)
 	if err != nil {
@@ -329,4 +329,4 @@ func (s Server) GetUserMovieReview(
 		return nil, err
 	}
 	return response, nil
-}	
+}

@@ -11,9 +11,10 @@ import (
 	gotmdbapi "github.com/ralvarezdev/go-tmdb-api"
 	v1 "github.com/ralvarezdev/proto-movies/gen/go/ralvarezdev/v1"
 	redisauthtypes "github.com/ralvarezdev/redis-auth-types-go"
+	sqlmovies "github.com/ralvarezdev/sql-movies/go"
 
 	goauthjwtclaims "github.com/ralvarezdev/connect-auth-types-go/jwt/claims"
-	internalpostgres "github.com/ralvarezdev/connect-movies/internal/databases/postgres"
+
 	internaltmdb "github.com/ralvarezdev/connect-movies/internal/tmdb"
 )
 
@@ -250,7 +251,12 @@ func (s *Service) SimilarMovies(
 	}
 
 	// Call TMDB API to get similar movies
-	apiResponse, statusCode, err := s.tmdbClient.SimilarMovies(ctx, request.GetId(), request.GetLanguage(), request.GetPage())
+	apiResponse, statusCode, err := s.tmdbClient.SimilarMovies(
+		ctx,
+		request.GetId(),
+		request.GetLanguage(),
+		request.GetPage(),
+	)
 	if err != nil {
 		if statusCode == http.StatusNotFound {
 			return nil, ConnErrMovieNotFound
@@ -451,7 +457,12 @@ func (s *Service) GetMovieReviews(
 	}
 
 	// Call TMDB API to get movie reviews
-	apiResponse, statusCode, err := s.tmdbClient.GetMovieReviews(ctx, request.GetId(), request.GetLanguage(), request.GetPage())
+	apiResponse, statusCode, err := s.tmdbClient.GetMovieReviews(
+		ctx,
+		request.GetId(),
+		request.GetLanguage(),
+		request.GetPage(),
+	)
 	if err != nil {
 		if statusCode == http.StatusNotFound {
 			return nil, ConnErrMovieNotFound
@@ -492,7 +503,7 @@ func (s *Service) AddUserMovieReview(
 	// Call the stored procedure to create the movie review in Postgres
 	if _, queryErr := s.pool.Exec(
 		ctx,
-		internalpostgres.CreateUserReviewProc,
+		sqlmovies.CreateUserReviewProc,
 		userID,
 		request.GetId(),
 		request.GetRating(),
@@ -504,7 +515,7 @@ func (s *Service) AddUserMovieReview(
 		}
 
 		// Check which unique constraint was violated
-		if constraintName != internalpostgres.UserReviewsUniqueUserMovieReview {
+		if constraintName != sqlmovies.UserReviewsUniqueUserMovieReview {
 			panic(queryErr)
 		}
 		return nil, ConnErrUserMovieReviewAlreadyExists
@@ -541,7 +552,7 @@ func (s *Service) UpdateUserMovieReview(
 	var userReviewFound sql.NullBool
 	if queryErr := s.pool.QueryRow(
 		ctx,
-		internalpostgres.UpdateUserReviewProc,
+		sqlmovies.UpdateUserReviewProc,
 		userID,
 		request.GetId(),
 		request.GetRating(),
@@ -590,7 +601,7 @@ func (s *Service) DeleteUserMovieReview(
 	var userReviewFound sql.NullBool
 	if queryErr := s.pool.QueryRow(
 		ctx,
-		internalpostgres.DeleteUserReviewProc,
+		sqlmovies.DeleteUserReviewProc,
 		userID,
 		request.GetId(),
 		nil,
@@ -632,7 +643,7 @@ func (s *Service) GetUserMovieReview(
 	)
 	if queryErr := s.pool.QueryRow(
 		ctx,
-		internalpostgres.GetUserReviewProc,
+		sqlmovies.GetUserReviewProc,
 		userID,
 		request.GetId(),
 		&outRating,
@@ -657,8 +668,8 @@ func (s *Service) GetUserMovieReview(
 
 	return &v1.GetUserMovieReviewResponse{
 		UserReview: &v1.UserMovieReview{
-			Rating:    int32(outRating.Int32),
-			Review:    outReviewText.String,
+			Rating: int32(outRating.Int32),
+			Review: outReviewText.String,
 		},
 	}, nil
 }

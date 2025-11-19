@@ -69,6 +69,8 @@ github.com/ralvarezdev/proto-movies/gen/go v0.3.0 h1:M4AmojqfNMtoxXrZMBICRl2CN/v
 github.com/ralvarezdev/proto-movies/gen/go v0.3.0/go.mod h1:QwkZGTwcqY5qARNzWG/rbqoWmvr813TPsRlcFH+jiz4=
 github.com/ralvarezdev/redis-auth-types-go v0.1.0 h1:gy3JjETeJbK7Ei23qKYNN1R2Uo5aU0rCoTSzVRJEsQA=
 github.com/ralvarezdev/redis-auth-types-go v0.1.0/go.mod h1:lWcWwj1pjEZjjreI/k9CtVdaDZlWimnxxi+PfFY0ZkE=
+github.com/ralvarezdev/sql-movies/go v0.1.0 h1:cGz9Xiq8ES9S2ImfFfCDDaLAFIMXOcgpsq+447eXC2Q=
+github.com/ralvarezdev/sql-movies/go v0.1.0/go.mod h1:4cXuxqwyvL6czSNT9wAHVQXn3CtsLy+BF4p5COrXrJ4=
 github.com/redis/go-redis/v9 v9.16.0 h1:OotgqgLSRCmzfqChbQyG1PHC3tLNR89DG4jdOERSEP4=
 github.com/redis/go-redis/v9 v9.16.0/go.mod h1:u410H11HMLoB+TP67dz8rL9s6QW2j76l0//kSOd3370=
 github.com/stoewer/go-strcase v1.3.1 h1:iS0MdW+kVTxgMoE1LAZyMiYJFKlOzLooE4MxjirtkAs=

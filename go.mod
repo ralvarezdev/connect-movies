@@ -19,6 +19,7 @@ require (
 	github.com/ralvarezdev/proto-auth/gen/go v0.1.7
 	github.com/ralvarezdev/proto-movies/gen/go v0.3.0
 	github.com/ralvarezdev/redis-auth-types-go v0.1.0
+	github.com/ralvarezdev/sql-movies/go v0.1.0
 	github.com/redis/go-redis/v9 v9.16.0
 	google.golang.org/protobuf v1.36.10
 )

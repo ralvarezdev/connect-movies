@@ -43,9 +43,9 @@ func Load() {
 	if err := internalloader.Loader.LoadIntVariable(
 		EnvPort,
 		&Port,
-		); err != nil {
-			panic(err)
-		}
+	); err != nil {
+		panic(err)
+	}
 
 	// Create the request injector
 	RequestInjector = goconnectrequest.NewDefaultInterceptor()

@@ -97,7 +97,11 @@ func MapToCastMember(castMember *gotmdbapi.Cast) *v1.CastMember {
 	var profileUrl *string
 	if castMember.ProfilePath != nil && len(*castMember.ProfilePath) > 0 {
 		profileUrl = new(string)
-		*profileUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, CastMemberProfileImageWidthSize, (*castMember.ProfilePath)[1:])
+		*profileUrl = fmt.Sprintf(
+			gotmdbapi.ImageVariableQualityURL,
+			CastMemberProfileImageWidthSize,
+			(*castMember.ProfilePath)[1:],
+		)
 	}
 
 	return &v1.CastMember{
@@ -134,7 +138,11 @@ func MapToCrewMember(crewMember *gotmdbapi.Crew) *v1.CrewMember {
 	var profileUrl *string
 	if crewMember.ProfilePath != nil && len(*crewMember.ProfilePath) > 0 {
 		profileUrl = new(string)
-		*profileUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, CrewMemberProfileImageWidthSize, (*crewMember.ProfilePath)[1:])
+		*profileUrl = fmt.Sprintf(
+			gotmdbapi.ImageVariableQualityURL,
+			CrewMemberProfileImageWidthSize,
+			(*crewMember.ProfilePath)[1:],
+		)
 	}
 
 	return &v1.CrewMember{
@@ -224,7 +232,11 @@ func MapToSimpleMovie(movie *gotmdbapi.SimpleMovie) *v1.SimpleMovie {
 	// Parse poster path from relative to full URL
 	var posterUrl string
 	if len(movie.PosterPath) > 0 {
-		posterUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, SimpleMoviePosterImageWidthSize, movie.PosterPath[1:])
+		posterUrl = fmt.Sprintf(
+			gotmdbapi.ImageVariableQualityURL,
+			SimpleMoviePosterImageWidthSize,
+			movie.PosterPath[1:],
+		)
 	}
 
 	return &v1.SimpleMovie{
@@ -461,7 +473,11 @@ func MapToProductionCompany(company *gotmdbapi.ProductionCompany) *v1.Production
 	var logoUrl *string
 	if company.LogoPath != nil && len(*company.LogoPath) > 0 {
 		logoUrl = new(string)
-		*logoUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, ProductionCompanyLogoImageWidthSize, (*company.LogoPath)[1:])
+		*logoUrl = fmt.Sprintf(
+			gotmdbapi.ImageVariableQualityURL,
+			ProductionCompanyLogoImageWidthSize,
+			(*company.LogoPath)[1:],
+		)
 	}
 
 	return &v1.ProductionCompany{
@@ -542,7 +558,11 @@ func MapToGetMovieDetailsResponse(response *gotmdbapi.MovieDetailsResponse) *v1.
 	// Parse poster path from relative to full URL
 	var posterUrl string
 	if len(response.PosterPath) > 0 {
-		posterUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, MovieDetailsPosterImageWidthSize, response.PosterPath[1:])
+		posterUrl = fmt.Sprintf(
+			gotmdbapi.ImageVariableQualityURL,
+			MovieDetailsPosterImageWidthSize,
+			response.PosterPath[1:],
+		)
 	}
 
 	return &v1.GetMovieDetailsResponse{
@@ -587,7 +607,11 @@ func MapToCriticAuthorDetails(authorDetails *gotmdbapi.AuthorDetails) *v1.Critic
 	var avatarUrl *string
 	if authorDetails.AvatarPath != nil && len(*authorDetails.AvatarPath) > 0 {
 		avatarUrl = new(string)
-		*avatarUrl = fmt.Sprintf(gotmdbapi.ImageVariableQualityURL, AvatarImageWidthSize, (*authorDetails.AvatarPath)[1:])
+		*avatarUrl = fmt.Sprintf(
+			gotmdbapi.ImageVariableQualityURL,
+			AvatarImageWidthSize,
+			(*authorDetails.AvatarPath)[1:],
+		)
 	}
 
 	return &v1.CriticAuthorDetails{
@@ -754,13 +778,13 @@ func MapToSortBy(sortBy v1.SortBy) gotmdbapi.SortByEnum {
 }
 
 // MapToWatchMonetizationType maps a gRPC watch monetization type to a TMDB API watch monetization type
-// 
+//
 // Parameters:
-// 
+//
 // - t: the gRPC watch monetization type to map
-// 
+//
 // Returns:
-// 
+//
 // - gotmdbapi.WatchMonetizationTypeEnums: the mapped TMDB API watch monetization type
 func MapToWatchMonetizationType(t v1.WatchMonetizationType) gotmdbapi.WatchMonetizationTypeEnums {
 	switch t {
@@ -781,14 +805,15 @@ func MapToWatchMonetizationType(t v1.WatchMonetizationType) gotmdbapi.WatchMonet
 	}
 }
 
-// MapToWatchMonetizationTypes maps a slice of gRPC watch monetization types to a slice of TMDB API watch monetization types
-// 
+// MapToWatchMonetizationTypes maps a slice of gRPC watch monetization types to a slice of TMDB API watch monetization
+// types
+//
 // Parameters:
-// 
-//  - types: the slice of gRPC watch monetization types to map
-// 
+//
+//   - types: the slice of gRPC watch monetization types to map
+//
 // Returns:
-// 
+//
 // - []gotmdbapi.WatchMonetizationTypeEnums: the mapped slice of TMDB API watch monetization types
 func MapToWatchMonetizationTypes(types []v1.WatchMonetizationType) []gotmdbapi.WatchMonetizationTypeEnums {
 	mappedTypes := make([]gotmdbapi.WatchMonetizationTypeEnums, 0, len(types))
