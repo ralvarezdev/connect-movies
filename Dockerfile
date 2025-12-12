@@ -29,9 +29,8 @@ FROM docker.io/library/alpine AS server
 WORKDIR /app
 COPY --from=builder /app .
 
-# Expose the HTTP and gRPC ports
+# Expose port to the outside world
 EXPOSE 8080
-EXPOSE 50051
 
 # Run the Go app when the container launches
 ENTRYPOINT ["sh", "serve.sh"]
