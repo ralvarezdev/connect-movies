@@ -94,10 +94,10 @@ func MapToCastMember(castMember *gotmdbapi.Cast) *v1.CastMember {
 	}
 
 	// Parse profile path from relative to full URL
-	var profileUrl *string
-	if castMember.ProfilePath != nil && len(*castMember.ProfilePath) > 0 {
-		profileUrl = new(string)
-		*profileUrl = fmt.Sprintf(
+	var profileURL *string
+	if castMember.ProfilePath != nil && *castMember.ProfilePath != "" {
+		profileURL = new(string)
+		*profileURL = fmt.Sprintf(
 			gotmdbapi.ImageVariableQualityURL,
 			CastMemberProfileImageWidthSize,
 			(*castMember.ProfilePath)[1:],
@@ -112,7 +112,7 @@ func MapToCastMember(castMember *gotmdbapi.Cast) *v1.CastMember {
 		Name:            castMember.Name,
 		OriginalName:    castMember.OriginalName,
 		Popularity:      popularity,
-		ProfileUrl:      profileUrl,
+		ProfileUrl:      profileURL,
 		CastId:          string(castMember.ID),
 		Character:       castMember.Character,
 		CreditId:        castMember.CreditID,
@@ -135,10 +135,10 @@ func MapToCrewMember(crewMember *gotmdbapi.Crew) *v1.CrewMember {
 	}
 
 	// Parse profile path from relative to full URL
-	var profileUrl *string
-	if crewMember.ProfilePath != nil && len(*crewMember.ProfilePath) > 0 {
-		profileUrl = new(string)
-		*profileUrl = fmt.Sprintf(
+	var profileURL *string
+	if crewMember.ProfilePath != nil && *crewMember.ProfilePath != "" {
+		profileURL = new(string)
+		*profileURL = fmt.Sprintf(
 			gotmdbapi.ImageVariableQualityURL,
 			CrewMemberProfileImageWidthSize,
 			(*crewMember.ProfilePath)[1:],
@@ -153,7 +153,7 @@ func MapToCrewMember(crewMember *gotmdbapi.Crew) *v1.CrewMember {
 		Name:            crewMember.Name,
 		OriginalName:    crewMember.OriginalName,
 		Popularity:      MapToOptionalFloat64(crewMember.Popularity),
-		ProfileUrl:      profileUrl,
+		ProfileUrl:      profileURL,
 		CreditId:        crewMember.CreditID,
 		Department:      crewMember.Department,
 		Job:             crewMember.Job,
@@ -230,9 +230,9 @@ func MapToSimpleMovie(movie *gotmdbapi.SimpleMovie) *v1.SimpleMovie {
 	}
 
 	// Parse poster path from relative to full URL
-	var posterUrl string
-	if len(movie.PosterPath) > 0 {
-		posterUrl = fmt.Sprintf(
+	var posterURL string
+	if movie.PosterPath != "" {
+		posterURL = fmt.Sprintf(
 			gotmdbapi.ImageVariableQualityURL,
 			SimpleMoviePosterImageWidthSize,
 			movie.PosterPath[1:],
@@ -247,7 +247,7 @@ func MapToSimpleMovie(movie *gotmdbapi.SimpleMovie) *v1.SimpleMovie {
 		OriginalTitle:        movie.OriginalTitle,
 		Overview:             movie.Overview,
 		Popularity:           MapToOptionalFloat64(movie.Popularity),
-		PosterUrl:            posterUrl,
+		PosterUrl:            posterURL,
 		ReleaseDate:          MapDateStringToTimestamp(movie.ReleaseDate),
 		Title:                movie.Title,
 		RatingAverageCritics: MapToOptionalFloat64(movie.VoteAverage),
@@ -470,10 +470,10 @@ func MapToProductionCompany(company *gotmdbapi.ProductionCompany) *v1.Production
 	}
 
 	// Parse logo path from relative to full URL
-	var logoUrl *string
-	if company.LogoPath != nil && len(*company.LogoPath) > 0 {
-		logoUrl = new(string)
-		*logoUrl = fmt.Sprintf(
+	var logoURL *string
+	if company.LogoPath != nil && *company.LogoPath != "" {
+		logoURL = new(string)
+		*logoURL = fmt.Sprintf(
 			gotmdbapi.ImageVariableQualityURL,
 			ProductionCompanyLogoImageWidthSize,
 			(*company.LogoPath)[1:],
@@ -482,7 +482,7 @@ func MapToProductionCompany(company *gotmdbapi.ProductionCompany) *v1.Production
 
 	return &v1.ProductionCompany{
 		Id:            company.ID,
-		LogoUrl:       logoUrl,
+		LogoUrl:       logoURL,
 		Name:          company.Name,
 		OriginCountry: company.OriginCountry,
 	}
@@ -556,9 +556,9 @@ func MapToGetMovieDetailsResponse(response *gotmdbapi.MovieDetailsResponse) *v1.
 	}
 
 	// Parse poster path from relative to full URL
-	var posterUrl string
-	if len(response.PosterPath) > 0 {
-		posterUrl = fmt.Sprintf(
+	var posterURL string
+	if response.PosterPath != "" {
+		posterURL = fmt.Sprintf(
 			gotmdbapi.ImageVariableQualityURL,
 			MovieDetailsPosterImageWidthSize,
 			response.PosterPath[1:],
@@ -574,7 +574,7 @@ func MapToGetMovieDetailsResponse(response *gotmdbapi.MovieDetailsResponse) *v1.
 		Id:                   response.ID,
 		OriginalTitle:        response.OriginalTitle,
 		Overview:             response.Overview,
-		PosterUrl:            posterUrl,
+		PosterUrl:            posterURL,
 		Popularity:           MapToOptionalFloat64(response.Popularity),
 		ProductionCompanies:  MapToProductionCompanies(response.ProductionCompanies),
 		ProductionCountries:  MapToProductionCountries(response.ProductionCountries),
@@ -604,10 +604,10 @@ func MapToCriticAuthorDetails(authorDetails *gotmdbapi.AuthorDetails) *v1.Critic
 	}
 
 	// Parse avatar path from relative to full URL
-	var avatarUrl *string
-	if authorDetails.AvatarPath != nil && len(*authorDetails.AvatarPath) > 0 {
-		avatarUrl = new(string)
-		*avatarUrl = fmt.Sprintf(
+	var avatarURL *string
+	if authorDetails.AvatarPath != nil && *authorDetails.AvatarPath != "" {
+		avatarURL = new(string)
+		*avatarURL = fmt.Sprintf(
 			gotmdbapi.ImageVariableQualityURL,
 			AvatarImageWidthSize,
 			(*authorDetails.AvatarPath)[1:],
@@ -617,7 +617,7 @@ func MapToCriticAuthorDetails(authorDetails *gotmdbapi.AuthorDetails) *v1.Critic
 	return &v1.CriticAuthorDetails{
 		Name:       authorDetails.Name,
 		Username:   authorDetails.Username,
-		AvatarPath: avatarUrl,
+		AvatarPath: avatarURL,
 		Rating:     authorDetails.Rating,
 	}
 }

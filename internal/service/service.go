@@ -668,7 +668,7 @@ func (s *Service) GetUserMovieReview(
 
 	return &v1.GetUserMovieReviewResponse{
 		UserReview: &v1.UserMovieReview{
-			Rating: int32(outRating.Int32),
+			Rating: outRating.Int32,
 			Review: outReviewText.String,
 		},
 	}, nil
