@@ -63,7 +63,9 @@ There are no automated tests; lint with `golangci-lint run` (`.golangci.yml`).
 
 ## Related repositories
 
-- [`proto-movies sql-movies`](https://github.com/ralvarezdev/proto-movies sql-movies) — protobuf definitions for the same microservice.
+- [`proto-movies`](https://github.com/ralvarezdev/proto-movies) — protobuf definitions for the same microservice.
+- [`sql-movies`](https://github.com/ralvarezdev/sql-movies) — SQL schema for the same microservice.
+
 ## License
 
 GNU General Public License v3.0. See [LICENSE](LICENSE).
