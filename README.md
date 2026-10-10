@@ -61,6 +61,9 @@ internal/logger/     logger setup
 
 There are no automated tests; lint with `golangci-lint run` (`.golangci.yml`).
 
+## Related repositories
+
+- [`proto-movies sql-movies`](https://github.com/ralvarezdev/proto-movies sql-movies) — protobuf definitions for the same microservice.
 ## License
 
 GNU General Public License v3.0. See [LICENSE](LICENSE).
